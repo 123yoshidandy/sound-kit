@@ -1,0 +1,346 @@
+:root {
+    --bg-top: #1a2150;
+    --bg-bottom: #0b1028;
+    --card: #1d2654;
+    --card-line: #2c3770;
+    --text: #eef1ff;
+    --muted: #a3acd6;
+    --accent: #45c4a0;
+    --accent-edge: #2a8a6f;
+    --gold: #f2c14e;
+    --gold-edge: #b88a1e;
+    --slate: #5b679c;
+    --slate-edge: #3c4675;
+    --segment: #2a3468;
+    --segment-active: #3b4a94;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--text);
+    font-family: 'M PLUS Rounded 1c', system-ui, sans-serif;
+    font-weight: 500;
+    background:
+        radial-gradient(circle at 15% 0%, rgba(69, 196, 160, 0.16), transparent 40%),
+        radial-gradient(circle at 90% 10%, rgba(242, 193, 78, 0.10), transparent 35%),
+        linear-gradient(180deg, var(--bg-top), var(--bg-bottom)) fixed;
+    padding: env(safe-area-inset-top) 0 calc(120px + env(safe-area-inset-bottom));
+}
+
+button {
+    font: inherit;
+    color: inherit;
+    border: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.top {
+    text-align: center;
+    padding: 22px 16px 6px;
+}
+
+.top h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--gold);
+}
+
+.top .game {
+    margin: 2px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    max-width: 640px;
+    margin: 14px auto 0;
+    padding: 0 16px;
+}
+
+.tab {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 12px;
+    background: var(--slate);
+    box-shadow: 0 4px 0 var(--slate-edge);
+    font-weight: 700;
+    transition: transform 0.05s;
+}
+
+.tab.is-active {
+    background: var(--accent);
+    box-shadow: 0 4px 0 var(--accent-edge);
+    color: #0b2a22;
+}
+
+.tab:active,
+.play:active,
+.fx:active,
+.instrument:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--slate-edge);
+}
+
+main {
+    max-width: 640px;
+    margin: 18px auto 0;
+    padding: 0 16px;
+}
+
+.panel {
+    display: none;
+}
+
+.panel.is-active {
+    display: block;
+}
+
+/* ===== BGM ===== */
+
+.song {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+
+.song-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.play {
+    flex: none;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 4px 0 var(--accent-edge);
+    display: grid;
+    place-items: center;
+    transition: transform 0.05s;
+}
+
+.play svg {
+    width: 22px;
+    height: 22px;
+    fill: #0b2a22;
+}
+
+.song.is-playing .play {
+    background: var(--gold);
+    box-shadow: 0 4px 0 var(--gold-edge);
+}
+
+.song-title {
+    min-width: 0;
+}
+
+.song-title h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.song-title p {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.sections {
+    display: flex;
+    gap: 3px;
+    margin-top: 12px;
+}
+
+.segment {
+    position: relative;
+    min-width: 0;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--segment);
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    padding: 0;
+}
+
+.segment.is-intro {
+    flex-grow: 0 !important;
+    flex-basis: 54px !important;
+}
+
+.segment .fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    background: var(--segment-active);
+}
+
+.segment .label {
+    position: relative;
+    white-space: nowrap;
+}
+
+.segment.is-current {
+    color: var(--text);
+    outline: 2px solid var(--gold);
+    outline-offset: -2px;
+}
+
+.now {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 2px 0;
+    font-size: 13px;
+    color: var(--muted);
+    min-height: 1.4em;
+    font-variant-numeric: tabular-nums;
+}
+
+.song.is-playing .now {
+    color: var(--text);
+}
+
+.song.is-reference {
+    border-style: dashed;
+}
+
+/* ===== 効果音 ===== */
+
+.effect-row {
+    display: grid;
+    grid-template-columns: 1fr 72px 72px;
+    gap: 10px;
+    align-items: center;
+}
+
+.effect-row {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 14px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+}
+
+.effect-row .name {
+    font-weight: 700;
+}
+
+.fx {
+    height: 42px;
+    border-radius: 12px;
+    font-weight: 800;
+    transition: transform 0.05s;
+}
+
+.fx.old {
+    background: var(--slate);
+    box-shadow: 0 4px 0 var(--slate-edge);
+}
+
+.fx.new {
+    background: var(--accent);
+    box-shadow: 0 4px 0 var(--accent-edge);
+    color: #0b2a22;
+}
+
+/* ===== 楽器 ===== */
+
+.instrument-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.instrument {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    box-shadow: 0 4px 0 var(--card-line);
+    border-radius: 14px;
+    padding: 12px;
+    text-align: left;
+    transition: transform 0.05s;
+}
+
+.instrument strong {
+    display: block;
+    font-size: 15px;
+}
+
+.instrument span {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+/* ===== 音量 ===== */
+
+.volume {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: #0d1333;
+    border-top: 1px solid var(--card-line);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 16px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.volume label {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.volume input {
+    flex: 1;
+    min-width: 0;
+    accent-color: var(--accent);
+}
+
+.volume .note {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 11px;
+    text-align: center;
+}
+
+@media (min-width: 700px) {
+    .volume {
+        grid-template-columns: 1fr 1fr;
+        max-width: 640px;
+        margin: 0 auto;
+        border-radius: 16px 16px 0 0;
+        border: 1px solid var(--card-line);
+    }
+
+    .instrument-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

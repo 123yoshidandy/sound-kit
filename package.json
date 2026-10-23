@@ -1,0 +1,16 @@
+{
+  "name": "sound-kit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "measure": "node tools/measure.mjs",
+    "lint:songs": "node tools/lint-songs.mjs",
+    "sync": "node scripts/sync.mjs",
+    "check": "node scripts/sync.mjs check"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.3"
+  }
+}

@@ -14,6 +14,7 @@
 - `src/sound-kit.js`：本体（普通の `<script>` で読むと `window.SoundKit` になる）
 - `src/sound-kit.mjs`：ES モジュールから使うための入口
 - `games/<ゲーム名>.js`：ゲームごとの曲と効果音（`SoundKit.register('<ゲーム名>', { songs, effects })`）
+- `games/<ゲーム名>.<曲名>.js`：曲の候補（同じ名前で `SoundKit.register` を呼ぶと、曲が足し合わされる）。試聴ページでは `index.html` に読み込みを足す。ゲームには配らないので、曲が決まったら `games/<ゲーム名>.js` に移す
 - `games/<ゲーム名>-legacy.js`：今の音を同じ形に移したもの（試聴ページで聞き比べるため。ゲームには配らない）
 - `index.html`・`audition/`：試聴ページ（GitHub Pages）。楽器の一覧と主旋律の候補は `audition/instruments.js`
 - `docs/composing.md`：作曲の作法（音域・パートの役割・ループのつなぎ方・音量の目安・記法）

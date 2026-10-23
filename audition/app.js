@@ -172,7 +172,9 @@
     function sameInstrument(preset, part) {
         if (preset.instrument !== part.instrument) return false;
         if (part.instrument !== 'chip') return true;
-        return (preset.wave ?? 'square') === (part.wave ?? 'square') && (preset.duty ?? 0.25) === (part.duty ?? 0.25);
+        // 'square' は幅 50% の矩形波と同じ音
+        const shape = (p) => (p.wave ?? 'square') === 'square' ? 'pulse:0.5' : p.wave === 'pulse' ? `pulse:${p.duty ?? 0.25}` : p.wave;
+        return shape(preset) === shape(part);
     }
 
     // 再生中の位置を、区間の帯と文字で見せる

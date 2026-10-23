@@ -317,13 +317,15 @@ async function main(argv) {
         }
 
         const f = (v, d = 1) => (Number.isFinite(v) ? v.toFixed(d) : '-');
+        // 無音のパートは -Infinity になるが、ページから受け取ると null に変わる。引き算で 0 扱いにしない
+        const diff = (a, b) => (Number.isFinite(a) && Number.isFinite(b) ? a - b : NaN);
         const songs = rows.filter(r => r.type === 'song');
         if (songs.length) {
             console.log('曲                          LUFS  スマホ  幅(LRA)  ピーク  音割れ  明るさ(Hz)  4kHz以上  つなぎ目の最小');
             songs.forEach(r => {
                 console.log(`${`${r.game}/${r.id}`.padEnd(28)}${f(r.lufs).padStart(6)}  ${f(r.phone).padStart(6)}  ${f(r.range).padStart(6)}  ${f(r.peak).padStart(6)}  ${String(r.clipped).padStart(5)}  ${f(r.centroid, 0).padStart(9)}  ${(r.high * 100).toFixed(1).padStart(7)}%  ${f(r.seamMin).padStart(8)}`);
                 console.log(`    区間: ${r.sections.map(s => `${s.label} ${f(s.lufs)}`).join(' / ')}`);
-                if (r.partLevels.length) console.log(`    パート（全体との差 dB、スマホ）: ${r.partLevels.map(p => `${p.name} ${f(p.lufs - r.lufs)}（${f(p.phone - r.phone)}）`).join(' / ')}`);
+                if (r.partLevels.length) console.log(`    パート（全体との差 dB、スマホ）: ${r.partLevels.map(p => `${p.name} ${f(diff(p.lufs, r.lufs))}（${f(diff(p.phone, r.phone))}）`).join(' / ')}`);
             });
         }
         const effects = rows.filter(r => r.type === 'effect');

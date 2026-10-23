@@ -280,7 +280,14 @@ async function main(argv) {
     try {
         const page = await chrome.openPage('about:blank', { onConsole: (text) => { if (/error|exception/.test(text)) errors.push(text); } });
         const files = ['src/sound-kit.js', ...fs.readdirSync(path.join(ROOT, 'games')).filter(f => f.endsWith('.js')).map(f => `games/${f}`), ...args.extra];
-        for (const file of files) await page.eval(fs.readFileSync(path.join(ROOT, file), 'utf8') + '\n;true');
+        for (const file of files) {
+            try {
+                await page.eval(fs.readFileSync(path.join(ROOT, file), 'utf8') + '\n;true');
+            } catch (error) {
+                // ほかの人が書きかけのファイルがあっても、測れるものは測る
+                console.error(`読み込めませんでした: ${file}（${error.message.split('\n')[0]}）`);
+            }
+        }
         await page.eval(`window.Measure = (${analysisCode.toString()})(); true`);
         if (args.out) fs.mkdirSync(args.out, { recursive: true });
 

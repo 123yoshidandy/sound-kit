@@ -24,11 +24,11 @@
     // ===== 音量をそろえる =====
     // 書き出して測った大きさ（LUFS）で合わせる。書き出すだけなので、音は鳴らない
 
-    const DEMO_LEVEL = -34;  // 楽器のフレーズの大きさ
-    const CHIP_TRIM = -5;    // 矩形波は、同じ数値でも大きく聞こえるので、その分小さくする
+    const DEMO_LEVEL = -34;  // 楽器のフレーズの大きさ。楽器ごとの聞こえ方の補正（trim）は audition/instruments.js
 
-    function perceivedTrim(preset) {
-        return preset.instrument === 'chip' && preset.wave !== 'triangle' ? CHIP_TRIM : 0;
+    // 曲のパートの楽器に当たる、一覧の楽器の補正
+    function trimOfPart(part) {
+        return INSTRUMENTS.find(item => sameInstrument(item.preset, part))?.trim ?? 0;
     }
 
     const dbToGain = (db) => 10 ** (db / 20);
@@ -37,7 +37,7 @@
     async function demoGain(item) {
         if (!demoGains.has(item.id)) {
             const buffer = await SoundKit.renderEffect(instruments.effects[item.id]);
-            demoGains.set(item.id, dbToGain(DEMO_LEVEL + perceivedTrim(item.preset) - SoundKit.loudness(buffer)));
+            demoGains.set(item.id, dbToGain(DEMO_LEVEL + item.trim - SoundKit.loudness(buffer)));
         }
         return demoGains.get(item.id);
     }
@@ -62,7 +62,8 @@
         return leadLevels.get(key);
     }
 
-    async function leadOverrides(id, preset) {
+    async function leadOverrides(id, item) {
+        const { preset } = item;
         const song = songs[id];
         const overrides = {};
         for (const partName of song.melody) {
@@ -70,7 +71,7 @@
             const volume = original.volume ?? 1;
             const before = await partLoudness(id, partName, null);
             const after = await partLoudness(id, partName, { ...preset, volume });
-            const trim = perceivedTrim(preset) - perceivedTrim(original);
+            const trim = item.trim - trimOfPart(original);
             overrides[partName] = { ...preset, volume: volume * dbToGain(before - after + trim) };
         }
         return overrides;
@@ -160,7 +161,7 @@
             }
             select.disabled = true;
             try {
-                const overrides = await leadOverrides(id, item.preset);
+                const overrides = await leadOverrides(id, item);
                 if (mine === request) player.setOverrides(id, overrides);
             } finally {
                 select.disabled = false;
@@ -228,8 +229,17 @@
 
     // ===== 楽器 =====
 
-    const grid = document.createElement('div');
-    grid.className = 'instrument-grid';
+    // 種別ごとに見出しを付けて並べる
+    const instrumentPanel = document.querySelector('#instruments');
+    const grids = new Map(instruments.groups.map(group => {
+        const heading = document.createElement('h2');
+        heading.className = 'group';
+        heading.textContent = group;
+        const grid = document.createElement('div');
+        grid.className = 'instrument-grid';
+        instrumentPanel.append(heading, grid);
+        return [group, grid];
+    }));
     INSTRUMENTS.forEach(item => {
         const button = document.createElement('button');
         button.className = 'instrument';
@@ -237,9 +247,8 @@
         button.querySelector('strong').textContent = item.name;
         button.querySelector('span').textContent = item.note;
         button.addEventListener('click', async () => player.play(`instrument:${item.id}`, { volume: await demoGain(item) }));
-        grid.appendChild(button);
+        grids.get(item.group).appendChild(button);
     });
-    document.querySelector('#instruments').appendChild(grid);
 
     // ===== 音量 =====
 

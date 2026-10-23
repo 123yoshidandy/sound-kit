@@ -373,3 +373,16 @@ main {
 .lead select:disabled {
     opacity: 0.6;
 }
+
+/* ===== 楽器の種別 ===== */
+
+.group {
+    margin: 18px 4px 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.group:first-child {
+    margin-top: 0;
+}

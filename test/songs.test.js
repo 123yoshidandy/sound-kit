@@ -5,7 +5,7 @@ import { loadKit, lintSong } from '../tools/lint-songs.mjs';
 
 const GAME_FILES = fs.readdirSync(path.resolve('games')).filter(f => f.endsWith('.js')).map(f => `games/${f}`);
 const SoundKit = loadKit(GAME_FILES);
-const LIBRARIES = GAME_FILES.map(file => /SoundKit\.register\('([^']+)'/.exec(fs.readFileSync(file, 'utf8'))[1]);
+const LIBRARIES = [...new Set(GAME_FILES.map(file => /SoundKit\.register\('([^']+)'/.exec(fs.readFileSync(file, 'utf8'))[1]))];
 
 describe.each(LIBRARIES)('%s', (name) => {
     const { songs, effects } = SoundKit.library(name);

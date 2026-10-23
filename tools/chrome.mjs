@@ -93,7 +93,7 @@ export async function launchChrome({ headless = true, chromePath = CHROME_PATHS.
             },
             async goto(nextUrl) {
                 await cdp('Page.navigate', { url: nextUrl }, sessionId);
-                await page.waitFor('document.readyState === "complete"');
+                await page.waitFor('document.readyState === "complete"', 30000); // 外部のフォントの読み込みを待つ
             },
             async waitFor(expression, timeout = 10000) {
                 const begin = Date.now();

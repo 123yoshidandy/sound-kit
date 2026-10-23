@@ -186,7 +186,7 @@
         if (compiledSongs.has(song)) return compiledSongs.get(song);
         if (song.file) throw new Error('音声ファイルの曲は組み立てられません');
         const stepsPerBar = song.stepsPerBar ?? 16;
-        const stepSeconds = 60 / song.bpm / (stepsPerBar / 4);
+        const stepSeconds = 60 / song.bpm / 4; // 1ステップは16分音符（3拍子は stepsPerBar: 12）
         const order = [...(song.intro ?? []), ...song.loop];
         const events = [];
         const sections = [];
@@ -1124,7 +1124,7 @@
         bus.connect(destination);
         const reverb = song.reverb ? createReverb(context, song.reverb) : null;
         if (reverb) reverb.output.connect(bus);
-        const echo = song.delay ? createEcho(context, song.delay, compiled.stepSeconds * (compiled.stepsPerBar / 4)) : null;
+        const echo = song.delay ? createEcho(context, song.delay, compiled.stepSeconds * 4) : null;
         if (echo) {
             echo.output.connect(bus);
             if (reverb && song.delay.reverb) {
@@ -1433,8 +1433,10 @@
     const libraries = {};
 
     // ゲームごとの曲と効果音を登録する（games/*.js から呼ぶ）。ほかの項目もそのまま残す
+    // 同じ名前で何度も呼ぶと、足し合わせる（曲の候補を別のファイルに分けて書くとき）
     function register(name, { songs = {}, effects = {}, ...rest }) {
-        libraries[name] = { ...rest, songs, effects };
+        const current = libraries[name] ?? { songs: {}, effects: {} };
+        libraries[name] = { ...current, ...rest, songs: { ...current.songs, ...songs }, effects: { ...current.effects, ...effects } };
     }
 
     function library(name) {

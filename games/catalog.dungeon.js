@@ -47,11 +47,11 @@
             arp: { instrument: 'kalimba', mode: 'arp', from: 'C4', volume: 0.45, pan: 0.25, reverb: 0.3, delay: 0.15 },
             pad: { instrument: 'pad', mode: 'chords', center: 'G3', voices: 3, volume: 0.4, cutoff: 800, attack: 1.2, reverb: 0.5 },
             // 遠くの合唱：イントロと B に薄く敷く
-            choir: { instrument: 'choir', mode: 'chords', center: 'Eb4', voices: 3, volume: 0.18, pan: -0.2, attack: 0.8, release: 1, vibrato: 8, reverb: 0.6 },
+            choir: { instrument: 'choir', mode: 'chords', center: 'Eb4', voices: 3, volume: 0.25, pan: -0.2, attack: 0.8, release: 1, vibrato: 8, reverb: 0.6 },
             // 低い弦の対旋律
             cello: { instrument: 'strings', volume: 0.5, pan: -0.3, attack: 0.4, release: 0.5, brightness: 0.6, reverb: 0.45 },
             // こもったホルン：B の区切りで、弱く和音を伸ばす
-            horn: { instrument: 'brass', mode: 'chords', center: 'G3', voices: 3, volume: 0.4, pan: 0.2, brightness: 2.5, attack: 0.12, release: 0.5, reverb: 0.5 },
+            horn: { instrument: 'brass', mode: 'chords', center: 'G3', voices: 3, volume: 0.5, pan: 0.2, brightness: 2.5, attack: 0.12, release: 0.5, reverb: 0.5 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, volume: 0.85, cutoff: 260, decay: 0.8, sustain: 0.5, release: 0.3, gate: 0.95 },
             drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.72, cutoff: 6000, levels: { kick: 0.85, rim: 0.4, shaker: 0.3, tom: 0.5, crash: 0.3 } }
         },

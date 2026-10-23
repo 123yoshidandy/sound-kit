@@ -50,23 +50,23 @@
         genre: 'ゲーム音楽',
         melody: ['lead'],   // 主旋律のパート（試聴ページで楽器を替えられる）
         bpm: 120,
-        gain: 0.055,
+        gain: 0.058,
         reverb: { seconds: 2.8, tone: 0.5 },
         delay: { time: 0.75, feedback: 0.25, tone: 2400, reverb: 0.3 },
         humanize: { time: 0.005, velocity: 0.07 },
         parts: {
-            lead: { instrument: 'piano', volume: 0.97, pan: -0.1, brightness: 0.95, release: 0.25, reverb: 0.3, delay: 0.12 },
+            lead: { instrument: 'piano', volume: 0.9, pan: -0.1, brightness: 0.95, release: 0.25, reverb: 0.3, delay: 0.12 },
             bell: { instrument: 'bell', volume: 0.45, pan: 0.35, reverb: 0.4, delay: 0.2 },
             // ハープ：明るくはじく弦の分散和音
             harp: { instrument: 'pluck', mode: 'arp', from: 'D4', brightness: 0.75, sustain: 0.997, volume: 1.1, pan: 0.28, reverb: 0.3, delay: 0.1 },
             // 弦の代わりのパッド。左右にゆっくり揺らして広げる
             pad: { instrument: 'pad', mode: 'chords', center: 'E4', voices: 4, volume: 0.25, cutoff: 1300, reverb: 0.45, chorus: { depth: 0.003, rate: 0.4, mix: 0.45 }, autopan: { rate: 0.15, depth: 0.25 } },
             // 弦楽器：B からパッドに替えて和音を敷く
-            strings: { instrument: 'strings', mode: 'chords', center: 'E4', voices: 4, volume: 0.38, pan: -0.2, attack: 0.4, release: 0.6, brightness: 0.8, reverb: 0.45 },
+            strings: { instrument: 'strings', mode: 'chords', center: 'E4', voices: 4, volume: 0.5, pan: -0.2, attack: 0.4, release: 0.6, brightness: 0.8, reverb: 0.45 },
             // 弦の対旋律：メロディの下を、長い音でゆっくり動く
-            counter: { instrument: 'strings', volume: 0.72, pan: 0.25, attack: 0.25, brightness: 0.7, reverb: 0.4 },
+            counter: { instrument: 'strings', volume: 0.85, pan: 0.25, attack: 0.25, brightness: 0.7, reverb: 0.4 },
             // ブラス：区間の頭で短く和音を吹く合いの手
-            brass: { instrument: 'brass', mode: 'chords', center: 'A4', voices: 3, volume: 0.38, pan: 0.15, brightness: 4, reverb: 0.35, delay: 0.05 },
+            brass: { instrument: 'brass', mode: 'chords', center: 'A4', voices: 3, volume: 0.48, pan: 0.15, brightness: 4, reverb: 0.35, delay: 0.05 },
             bass: { instrument: 'pluck', mode: 'bass', octave: 2, brightness: 0.4, sustain: 0.995, release: 0.12, volume: 1.1, gate: 0.9 },
             // ドラム：tom をティンパニに見立てる
             drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.8, levels: { kick: 0.7, snare: 0.35, shaker: 0.45, tom: 0.85, crash: 0.5 }, reverb: 0.2 }

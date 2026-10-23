@@ -51,7 +51,7 @@
             accordion: { instrument: 'accordion', mode: 'chords', center: 'F4', voices: 3, volume: 0.34, pan: -0.3, cutoff: 2400, reverb: 0.3 },
             pad: { instrument: 'pad', mode: 'chords', center: 'A3', voices: 3, volume: 0.32, cutoff: 1000, attack: 0.8, reverb: 0.4 },
             // 弦楽器：B でパッドに替えて敷く
-            strings: { instrument: 'strings', mode: 'chords', center: 'A3', voices: 4, volume: 0.2, pan: -0.15, attack: 0.4, release: 0.5, brightness: 0.75, reverb: 0.4 },
+            strings: { instrument: 'strings', mode: 'chords', center: 'A3', voices: 4, volume: 0.3, pan: -0.15, attack: 0.4, release: 0.5, brightness: 0.75, reverb: 0.4 },
             bass: { instrument: 'pluck', mode: 'bass', octave: 2, brightness: 0.35, sustain: 0.995, release: 0.12, volume: 1, gate: 0.9 },
             drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.6, cutoff: 7000, levels: { kick: 0.7, rim: 0.4, shaker: 0.35, tom: 0.45, crash: 0.25 } }
         },

@@ -75,11 +75,11 @@
             arp: { instrument: 'pluck', mode: 'arp', from: 'C4', brightness: 0.55, sustain: 0.993, release: 0.05, volume: 0.7, pan: 0.28, reverb: 0.2 },
             pad: { instrument: 'pad', mode: 'chords', center: 'B3', voices: 3, volume: 0.36, cutoff: 1000, reverb: 0.4 },
             // 弦楽器：サビで和音を伸ばして厚くする
-            strings: { instrument: 'strings', mode: 'chords', center: 'E4', voices: 4, volume: 0.25, pan: -0.25, attack: 0.12, release: 0.3, reverb: 0.35 },
+            strings: { instrument: 'strings', mode: 'chords', center: 'E4', voices: 4, volume: 0.35, pan: -0.25, attack: 0.12, release: 0.3, reverb: 0.35 },
             // ブラス：小節の頭の短い和音
             brass: { instrument: 'brass', mode: 'chords', center: 'B4', voices: 3, volume: 0.35, pan: 0.18, reverb: 0.25 },
             // 合唱：休憩とループの終わりのサビに薄く敷く
-            choir: { instrument: 'choir', mode: 'chords', center: 'E4', voices: 3, volume: 0.22, pan: 0.1, attack: 0.5, reverb: 0.45 },
+            choir: { instrument: 'choir', mode: 'chords', center: 'E4', voices: 3, volume: 0.3, pan: 0.1, attack: 0.5, reverb: 0.45 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, volume: 0.9, cutoff: 400, decay: 0.18, sustain: 0.35, release: 0.04, gate: 0.8 },
             drums: { instrument: 'drums', kit: 'acoustic', mode: 'drums', volume: 0.6, cutoff: 7500, levels: { kick: 0.85, snare: 0.55, hat: 0.5, openHat: 0.4, tom: 0.55, crash: 0.45 } }
         },

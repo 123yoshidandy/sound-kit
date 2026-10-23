@@ -35,7 +35,7 @@
 
     const chinese = {
         title: '桃の花の庭',
-        description: '古箏と笛・中華風でのどか',
+        tags: ['のどか', '中華風'],
         genre: 'ワールド',
         melody: ['lead'],
         bpm: 96,

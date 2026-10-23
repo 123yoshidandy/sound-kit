@@ -110,8 +110,45 @@
     const formatTime = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
     const cards = new Map();
 
+    // ===== タグ =====
+    // 雰囲気は曲のデータの tags。テンポ・拍子・主旋律の楽器は、曲のデータから自動で決める
+
+    const MOODS = ['明るい', '軽快', '楽しい', '落ち着いた', '静か', 'やさしい', 'のどか', 'おしゃれ', '優雅', '渋い', '冒険', '緊張感', '神秘的', '和風', '中華風', '中東風', '南国', 'ケルト'];
+    const FACETS = [
+        { name: '雰囲気', of: (song) => song.tags ?? [], order: MOODS },
+        { name: 'テンポ', of: (song) => [song.bpm < 90 ? 'ゆっくり' : song.bpm >= 126 ? '速い' : 'ふつう'], order: ['ゆっくり', 'ふつう', '速い'] },
+        { name: '拍子', of: (song) => [song.meter === '6/8' ? '8分の6拍子' : (song.stepsPerBar ?? 16) === 12 ? '3拍子' : '4拍子'], order: ['4拍子', '3拍子', '8分の6拍子'] },
+        { name: '主旋律', of: (song) => song.melody ? [instrumentName(song.parts[song.melody[0]])] : [], order: [] }
+    ];
+
+    // 絞り込みでは、チップの矩形波の幅の違いはまとめて「チップ」にする
+    function instrumentName(part) {
+        if (part.instrument === 'chip' && part.wave !== 'triangle') return 'チップ';
+        return INSTRUMENTS.find(item => sameInstrument(item.preset, part))?.name ?? part.instrument;
+    }
+
+    // 選んだタグ（種類ごと）。同じ種類の中は「どれか」、違う種類どうしは「すべて」に当てはまる曲を出す
+    const selected = new Map(FACETS.map(facet => [facet.name, new Set()]));
+
+    function matches(song) {
+        return FACETS.every(facet => {
+            const chosen = selected.get(facet.name);
+            return chosen.size === 0 || facet.of(song).some(tag => chosen.has(tag));
+        });
+    }
+
+    function toggleTag(facetName, tag) {
+        const chosen = selected.get(facetName);
+        if (chosen.has(tag)) chosen.delete(tag);
+        else chosen.add(tag);
+        applyFilter();
+    }
+
     const bgmPanel = document.querySelector('#bgm');
-    SONG_GROUPS.forEach(({ title, ids }) => {
+    const filters = createFilters();
+    bgmPanel.appendChild(filters.element);
+
+    const groupElements = SONG_GROUPS.map(({ title, ids }) => {
         const heading = document.createElement('h2');
         heading.className = 'group';
         heading.textContent = title;
@@ -120,7 +157,79 @@
         grid.className = 'song-grid';
         bgmPanel.append(heading, grid);
         ids.forEach(id => createCard(id, songs[id], grid));
+        return { heading, grid, ids };
     });
+    applyFilter();
+
+    // 絞り込みの欄。スマホでは閉じておき、押すと開く
+    function createFilters() {
+        const element = document.createElement('section');
+        element.className = 'filters';
+        element.innerHTML = `
+            <div class="filters-head">
+                <button class="filters-toggle" aria-expanded="false">絞り込み<span class="chevron"></span></button>
+                <span class="count"></span>
+                <button class="clear">解除</button>
+            </div>
+            <div class="facets"></div>`;
+        const facetBox = element.querySelector('.facets');
+        const chips = [];
+        FACETS.forEach(facet => {
+            const counts = new Map();
+            Object.values(songs).forEach(song => facet.of(song).forEach(tag => counts.set(tag, (counts.get(tag) ?? 0) + 1)));
+            const tags = [...counts.keys()].sort((a, b) => {
+                const ia = facet.order.indexOf(a), ib = facet.order.indexOf(b);
+                if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+                return counts.get(b) - counts.get(a);
+            });
+            const row = document.createElement('div');
+            row.className = 'facet';
+            row.innerHTML = '<span class="facet-name"></span><div class="chips"></div>';
+            row.querySelector('.facet-name').textContent = facet.name;
+            tags.forEach(tag => {
+                const chip = document.createElement('button');
+                chip.className = 'chip';
+                chip.textContent = tag;
+                chip.addEventListener('click', () => toggleTag(facet.name, tag));
+                row.querySelector('.chips').appendChild(chip);
+                chips.push({ chip, facet: facet.name, tag });
+            });
+            facetBox.appendChild(row);
+        });
+        const toggle = element.querySelector('.filters-toggle');
+        const setOpen = (open) => {
+            element.classList.toggle('is-open', open);
+            toggle.setAttribute('aria-expanded', String(open));
+        };
+        setOpen(window.matchMedia('(min-width: 700px)').matches);
+        toggle.addEventListener('click', () => setOpen(!element.classList.contains('is-open')));
+        element.querySelector('.clear').addEventListener('click', () => {
+            selected.forEach(set => set.clear());
+            applyFilter();
+        });
+        return { element, chips };
+    }
+
+    function applyFilter() {
+        let shown = 0;
+        groupElements.forEach(({ heading, grid, ids }) => {
+            let visible = 0;
+            ids.forEach(id => {
+                const ok = matches(songs[id]);
+                cards.get(id).card.hidden = !ok;
+                if (ok) visible++;
+            });
+            heading.hidden = grid.hidden = visible === 0;
+            shown += visible;
+        });
+        const active = [...selected.values()].some(set => set.size > 0);
+        filters.element.querySelector('.count').textContent = active ? `${Object.keys(songs).length}曲中 ${shown}曲` : `${Object.keys(songs).length}曲`;
+        filters.element.querySelector('.clear').hidden = !active;
+        filters.element.classList.toggle('is-active', active);
+        const isOn = (facet, tag) => selected.get(facet).has(tag);
+        filters.chips.forEach(({ chip, facet, tag }) => chip.classList.toggle('is-on', isOn(facet, tag)));
+        document.querySelectorAll('.song .tag').forEach(chip => chip.classList.toggle('is-on', isOn(chip.dataset.facet, chip.textContent)));
+    }
 
     function createCard(id, song, container) {
         const compiled = SoundKit.compileSong(song);
@@ -132,14 +241,23 @@
                 <button class="play" aria-label="再生">${PLAY_ICON}</button>
                 <div class="song-title">
                     <h2></h2>
-                    <p></p>
+                    <div class="tags"></div>
                 </div>
             </div>
             <div class="sections"></div>
             <div class="now"><span class="where"></span><span class="time"></span></div>
             <label class="lead">主旋律<select></select></label>`;
         card.querySelector('h2').textContent = song.title;
-        card.querySelector('.song-title p').textContent = song.description;
+        // カードのタグ（雰囲気と、4拍子でない拍子）。押すと、そのタグで絞り込む
+        const cardTags = [...(song.tags ?? []).map(tag => ['雰囲気', tag]), ...FACETS[2].of(song).filter(tag => tag !== '4拍子').map(tag => ['拍子', tag])];
+        cardTags.forEach(([facet, tag]) => {
+            const chip = document.createElement('button');
+            chip.className = 'tag';
+            chip.dataset.facet = facet;
+            chip.textContent = tag;
+            chip.addEventListener('click', () => toggleTag(facet, tag));
+            card.querySelector('.tags').appendChild(chip);
+        });
         const info = `テンポ ${song.bpm}・ループ ${formatTime(loopSeconds)}`;
 
         const strip = card.querySelector('.sections');

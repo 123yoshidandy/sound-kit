@@ -11,7 +11,7 @@
     // チップチューン：ファミコンのような音で、軽快に
     const pixel = {
         title: 'ピクセル・ステップ',
-        description: 'チップチューン・軽快',
+        tags: ['軽快', '明るい'],
         genre: 'チップチューン',
         melody: ['lead', 'leadB'],   // 主旋律のパート（試聴ページで楽器を替えられる）
         bpm: 132,
@@ -126,7 +126,7 @@
     // マリンバとベル：明るいパズルゲームらしく
     const hidamari = {
         title: 'ひだまりパズル',
-        description: 'マリンバとベル・明るい',
+        tags: ['明るい', 'やさしい'],
         genre: 'ゲーム音楽',
         melody: ['lead'],
         bpm: 110,
@@ -230,7 +230,7 @@
     // エレピとピアノ：落ち着いた、大人っぽい雰囲気で
     const yofuke = {
         title: '夜更けのロジック',
-        description: 'エレピとピアノ・落ち着いた',
+        tags: ['落ち着いた', 'おしゃれ'],
         genre: 'ジャズ・ブルース',
         melody: ['lead'],
         bpm: 84,
@@ -326,7 +326,7 @@
     // チップ×シンセポップ：チップのメロディに、今風の伴奏を合わせる
     const neon = {
         title: 'ネオンタイル',
-        description: 'チップ×シンセポップ',
+        tags: ['軽快', '明るい'],
         genre: 'チップチューン',
         melody: ['lead'],
         bpm: 120,

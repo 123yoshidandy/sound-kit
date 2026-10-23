@@ -50,7 +50,7 @@
 
     const mideast = {
         title: '砂の回廊',
-        description: 'ピアノとウード・神秘的な中東風',
+        tags: ['神秘的', '中東風'],
         genre: 'ワールド',
         melody: ['lead'],
         bpm: 104,

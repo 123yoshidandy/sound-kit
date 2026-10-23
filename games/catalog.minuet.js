@@ -32,7 +32,7 @@
 
     const minuet = {
         title: '庭園のメヌエット',
-        description: 'ピアノとチェンバロ風の弦・優雅な3拍子',
+        tags: ['優雅'],
         genre: 'クラシック',
         melody: ['lead'],   // 主旋律のパート（試聴ページで楽器を替えられる）
         bpm: 126,

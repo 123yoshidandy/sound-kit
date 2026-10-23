@@ -10,11 +10,11 @@
     const CHIP = (duty, extra = {}) => ({ instrument: 'chip', wave: 'pulse', duty, level: 0.2, vibrato: 14, sustain: 0.6, ...extra });
 
     const LIST = [
-        { id: 'piano', group: '鍵盤', name: 'ピアノ', note: '弦をハンマーでたたく', instrument: 'piano', lead: true },
+        { id: 'piano', group: '鍵盤', trim: -2, name: 'ピアノ', note: '弦をハンマーでたたく', instrument: 'piano', lead: true },
         { id: 'marimba', group: 'たたく・はじく', name: 'マリンバ', note: '木の板をたたく', instrument: 'marimba', lead: true },
         { id: 'xylophone', group: 'たたく・はじく', name: 'シロフォン', note: '硬く短い木の板', instrument: 'xylophone', lead: true },
         { id: 'vibes', group: 'たたく・はじく', name: 'ビブラフォン', note: '金属の板・揺れ', instrument: 'vibes', lead: true },
-        { id: 'bell', group: 'たたく・はじく', name: 'ベル', note: 'FM・金属的', instrument: 'bell', lead: true },
+        { id: 'bell', group: 'たたく・はじく', trim: -2, name: 'ベル', note: 'FM・金属的', instrument: 'bell', lead: true },
         { id: 'musicBox', group: 'たたく・はじく', name: 'オルゴール', note: '細い金属の歯', instrument: 'musicBox', lead: true },
         { id: 'kalimba', group: 'たたく・はじく', name: 'カリンバ', note: '丸い金属の歯', instrument: 'kalimba', lead: true },
         { id: 'steelpan', group: 'たたく・はじく', name: 'スチールパン', note: '南国の金属の鍋', instrument: 'steelpan', lead: true },
@@ -25,7 +25,7 @@
         { id: 'whistle', group: '伸ばす', name: '口笛', note: '澄んだサイン波', instrument: { instrument: 'flute', breath: 0, vibrato: 18 }, lead: true },
         { id: 'ocarina', group: '伸ばす', name: 'オカリナ', note: '丸くこもった笛', instrument: 'ocarina', lead: true },
         { id: 'clarinet', group: '伸ばす', name: 'クラリネット', note: '木の管・奇数倍音', instrument: 'clarinet', lead: true },
-        { id: 'organ', group: '鍵盤', name: 'オルガン', note: '倍音を足した持続音', instrument: 'organ', lead: true },
+        { id: 'organ', group: '鍵盤', trim: -2, name: 'オルガン', note: '倍音を足した持続音', instrument: 'organ', lead: true },
         { id: 'softLead', group: '伸ばす', name: 'シンセリード', note: 'やわらかい・ビブラート', instrument: 'softLead', lead: true },
         { id: 'chip25', group: 'チップ', trim: -5, name: 'チップ 25%', note: '矩形波・ファミコン風', instrument: CHIP(0.25), lead: true },
         { id: 'chip12', group: 'チップ', trim: -5, name: 'チップ 12.5%', note: '細い矩形波', instrument: CHIP(0.125, { vibrato: 16 }), lead: true },

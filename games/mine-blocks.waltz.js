@@ -19,7 +19,7 @@
 
     const waltz = {
         title: 'オルゴールのワルツ',
-        description: 'オルゴールとカリンバ・やさしい',
+        tags: ['やさしい'],
         genre: 'クラシック',
         melody: ['lead', 'leadB'],   // 主旋律のパート（試聴ページで楽器を替えられる）
         bpm: 132,

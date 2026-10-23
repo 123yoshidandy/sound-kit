@@ -400,3 +400,140 @@ main {
 .group:first-child {
     margin-top: 0;
 }
+
+[hidden] {
+    display: none !important;
+}
+
+/* ===== 絞り込み ===== */
+
+.filters {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    padding: 10px 14px;
+    margin-bottom: 4px;
+}
+
+.filters-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.filters-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    background: none;
+    font-weight: 800;
+}
+
+.filters-toggle .chevron {
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform 0.15s;
+}
+
+.filters.is-open .filters-toggle .chevron {
+    transform: rotate(-135deg) translateY(-2px);
+}
+
+.filters .count {
+    flex: 1;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.filters.is-active .count {
+    color: var(--gold);
+    font-weight: 700;
+}
+
+.filters .clear {
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--slate);
+    box-shadow: 0 3px 0 var(--slate-edge);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.facets {
+    display: none;
+    margin-top: 8px;
+}
+
+.filters.is-open .facets {
+    display: block;
+}
+
+.facet {
+    display: flex;
+    gap: 10px;
+    padding: 6px 0;
+    border-top: 1px solid var(--card-line);
+}
+
+.facet-name {
+    flex: none;
+    width: 52px;
+    padding-top: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.chip {
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--segment);
+    box-shadow: 0 3px 0 #1a2150;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.chip:active,
+.filters .clear:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+.chip.is-on,
+.tag.is-on {
+    background: var(--accent);
+    box-shadow: 0 3px 0 var(--accent-edge);
+    color: #0b2a22;
+}
+
+/* カードのタグ（押すと絞り込む） */
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.tag {
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: var(--segment);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.tag.is-on {
+    box-shadow: none;
+}

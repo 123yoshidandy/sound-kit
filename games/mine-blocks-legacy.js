@@ -12,7 +12,7 @@
 
     const legacy = {
         title: 'mine-blocks の今の BGM',
-        description: 'チップチューン・8小節',
+        tags: ['軽快'],
         genre: 'チップチューン',
         melody: ['melody'],
         bpm: 144,

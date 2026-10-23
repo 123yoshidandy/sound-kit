@@ -8,6 +8,7 @@
     const wafu = {
         title: 'ことのは庭',
         description: '笛と琴・和風で落ち着いた',
+        genre: 'ワールド',
         melody: ['lead'],
         bpm: 92,
         gain: 0.06,

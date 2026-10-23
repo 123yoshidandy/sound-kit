@@ -15,6 +15,7 @@
     const bossa = {
         title: '午後のカフェテラス',
         description: 'ギターとフルート・おしゃれで落ち着いた',
+        genre: 'ラテン',
         melody: ['lead'],
         bpm: 126,
         gain: 0.075,

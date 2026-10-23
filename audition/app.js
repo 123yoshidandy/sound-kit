@@ -28,15 +28,13 @@
     const songs = { ...current.songs, legacy: legacy.songs.legacy };
     Object.entries(catalogSongs).forEach(([id, song]) => { songs[`catalog/${id}`] = song; });
 
-    // BGM のタブの見出し。曲の一覧はジャンル別（この順に並べ、ここにないジャンルは最後）
-    const GENRES = ['クラシック', 'ジャズ・ブルース', 'ファンク・ソウル', 'ロック・ポップ', 'ラテン', 'ワールド', 'ゲーム音楽', 'アンビエント', 'エレクトロ'];
+    // BGM のタブの見出し。全曲をジャンル別に並べる（この順に並べ、ここにないジャンルは最後。今の BGM はそのジャンルの最後）
+    const GENRES = ['チップチューン', 'ゲーム音楽', 'クラシック', 'ジャズ・ブルース', 'ファンク・ソウル', 'ロック・ポップ', 'ラテン', 'ワールド', 'アンビエント', 'エレクトロ'];
     const genreOf = (song) => song.genre ?? 'そのほか';
-    const genres = [...new Set(Object.values(catalogSongs).map(genreOf))]
-        .sort((a, b) => (GENRES.indexOf(a) + 1 || 99) - (GENRES.indexOf(b) + 1 || 99));
-    const SONG_GROUPS = [
-        { title: `${GAME} の候補`, ids: [...Object.keys(current.songs), 'legacy'] },
-        ...genres.map(genre => ({ title: genre, ids: Object.keys(catalogSongs).filter(id => genreOf(catalogSongs[id]) === genre).map(id => `catalog/${id}`) }))
-    ];
+    const songIds = [...Object.keys(songs).filter(id => id !== 'legacy'), 'legacy'];
+    const SONG_GROUPS = [...new Set(songIds.map(id => genreOf(songs[id])))]
+        .sort((a, b) => (GENRES.indexOf(a) + 1 || 99) - (GENRES.indexOf(b) + 1 || 99))
+        .map(genre => ({ title: genre, ids: songIds.filter(id => genreOf(songs[id]) === genre) }));
     const player = SoundKit.createPlayer({ songs, effects, ignoreSilentSwitch: true });
     player.setup();
 

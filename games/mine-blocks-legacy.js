@@ -11,8 +11,9 @@
     const EFFECTS_VOLUME = 0.5;
 
     const legacy = {
-        title: '今の BGM',
+        title: 'mine-blocks の今の BGM',
         description: 'チップチューン・8小節',
+        genre: 'チップチューン',
         melody: ['melody'],
         bpm: 144,
         gain: BGM_VOLUME,

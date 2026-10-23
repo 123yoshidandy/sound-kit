@@ -43,6 +43,7 @@
     const tropical = {
         title: 'ココナツ・ステップ',
         description: 'スチールパンとマリンバ・明るいカリプソ',
+        genre: 'ワールド',
         melody: ['lead'],   // 主旋律のパート（試聴ページで楽器を替えられる）
         bpm: 112,
         swing: 0.08,

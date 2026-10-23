@@ -13,6 +13,7 @@
     const legacy = {
         title: '今の BGM',
         description: 'チップチューン・8小節',
+        melody: ['melody'],
         bpm: 144,
         gain: BGM_VOLUME,
         parts: {

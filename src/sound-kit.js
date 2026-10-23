@@ -481,10 +481,11 @@
         return node;
     }
 
-    // だんだん消えるサイン波（打楽器の倍音に使う）
-    function decayingSine(context, out, time, frequency, peak, decay) {
+    // だんだん消えるサイン波（打楽器の倍音に使う）。bend は、たたいた瞬間に高さが上ずる割合
+    function decayingSine(context, out, time, frequency, peak, decay, bend = 0) {
         if (frequency > context.sampleRate * 0.45 || peak <= 0) return;
-        const osc = oscillator(context, 'sine', frequency, time);
+        const osc = oscillator(context, 'sine', frequency * (1 + bend), time);
+        if (bend) osc.frequency.exponentialRampToValueAtTime(frequency, time + 0.04);
         const gain = context.createGain();
         gain.gain.setValueAtTime(0, time);
         gain.gain.linearRampToValueAtTime(peak, time + 0.002);
@@ -492,6 +493,77 @@
         osc.connect(gain).connect(out);
         osc.start(time);
         osc.stop(time + decay * 1.5 + 0.02);
+    }
+
+    // 板や歯をたたいた音：倍音（[倍率, 大きさ, 減衰の割合]）を重ね、当たる音を少し足す
+    function struck(context, out, note, { partials, decay, click = 0, clickFrequency = 4000, bend = 0 }) {
+        const { time, frequency, velocity } = note;
+        partials.forEach(([ratio, level, share]) => decayingSine(context, out, time, frequency * ratio, level * velocity, decay * share, bend));
+        if (click) noiseBurst(context, out, time, { duration: 0.012, peak: click * velocity, type: 'bandpass', frequency: Math.min(clickFrequency, 8000), q: 1 });
+    }
+
+    // 息の音：音の長さのあいだ鳴り続ける、帯域を絞った雑音
+    function breath(context, out, time, duration, { frequency, peak, release = 0.1 }) {
+        if (peak <= 0) return;
+        const source = context.createBufferSource();
+        source.buffer = noiseBuffer(context);
+        source.loop = true;
+        const filter = context.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = Math.min(frequency, 9000);
+        filter.Q.value = 1.2;
+        const gain = context.createGain();
+        gain.gain.setValueAtTime(0, time);
+        gain.gain.linearRampToValueAtTime(peak, time + 0.03);
+        gain.gain.setTargetAtTime(peak * 0.35, time + 0.03, 0.06);
+        const end = time + Math.max(duration, 0.03);
+        gain.gain.setTargetAtTime(0, end, release / 4.6);
+        source.connect(filter).connect(gain).connect(out);
+        source.start(time, Math.random() * 1.5);
+        source.stop(end + release * 1.5);
+    }
+
+    // 管楽器・オルガン：倍音（[倍率, 大きさ]）を重ねて伸ばし、ビブラートと息の音を足す
+    function wind(context, out, note, { partials, wave = null, peak, attack, release = 0.12, sustain = 0.85, vibrato = 0, vibratoRate = 5, vibratoDelay = 0.25, breathLevel = 0, cutoff = null }) {
+        const { time, frequency, velocity, duration } = note;
+        const amp = context.createGain();
+        const stop = envelope(amp.gain, time, duration, { attack, decay: 0.4, sustain, release }, peak * velocity);
+        let input = amp;
+        if (cutoff) {
+            const filter = context.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = cutoff;
+            filter.Q.value = 0.5;
+            filter.connect(amp);
+            input = filter;
+        }
+        const oscs = (wave ? [[1, 1, wave]] : partials).flatMap(([ratio, level, type = 'sine']) => {
+            if (frequency * ratio > context.sampleRate * 0.45) return [];
+            const osc = oscillator(context, type, frequency * ratio, time);
+            applyGlide(osc, { ...note, glideFrequency: note.glideFrequency ? note.glideFrequency * ratio : null });
+            const gain = context.createGain();
+            gain.gain.value = level;
+            osc.connect(gain).connect(input);
+            osc.start(time);
+            osc.stop(stop + 0.02);
+            return [osc];
+        });
+        addVibrato(context, oscs, time, stop, { depth: vibrato, rate: vibratoRate, delay: vibratoDelay });
+        amp.connect(out);
+        breath(context, out, time, duration, { frequency: frequency * 2, peak: breathLevel * velocity, release });
+    }
+
+    // クラリネットの波形：奇数倍の倍音が強い
+    function clarinetWave(context) {
+        const cache = cacheOf(context);
+        if (!cache.waves.has('clarinet')) {
+            const size = 32;
+            const real = new Float32Array(size);
+            const imag = new Float32Array(size);
+            for (let n = 1; n < size; n++) imag[n] = n % 2 === 1 ? 1 / n ** 1.1 : 0.03 / n;
+            cache.waves.set('clarinet', context.createPeriodicWave(real, imag));
+        }
+        return cache.waves.get('clarinet');
     }
 
     // 雑音を、フィルターを通して短く鳴らす（打楽器）
@@ -739,6 +811,62 @@
             osc.stop(stop + 0.02);
         },
 
+        // シロフォン：マリンバより硬く、短い。倍音は3倍
+        xylophone(context, out, note, p) {
+            const decay = clamp(0.6 * (262 / note.frequency) ** 0.6, 0.1, 0.9) * (p.decay ?? 1);
+            struck(context, out, note, { decay, partials: [[1, 0.55, 1], [3, 0.22, 0.3], [6.2, 0.06, 0.1]], click: 0.14, clickFrequency: note.frequency * 6 });
+        },
+
+        // オルゴール：細い金属の歯をはじいた音。高い倍音がすぐ消えて、基音が長く残る
+        musicBox(context, out, note, p) {
+            const decay = clamp(2.2 * (523 / note.frequency) ** 0.5, 0.6, 3) * (p.decay ?? 1);
+            struck(context, out, note, { decay, partials: [[1, 0.5, 1], [6.27, 0.12, 0.12], [17.55, 0.04, 0.04]], click: 0.05, clickFrequency: 6000 });
+        },
+
+        // カリンバ：オルゴールより低く丸い。はじいた瞬間に少し高さが上ずり、わずかにうなる
+        kalimba(context, out, note, p) {
+            const decay = clamp(1.4 * (262 / note.frequency) ** 0.5, 0.4, 2) * (p.decay ?? 1);
+            struck(context, out, note, { decay, bend: 0.012, partials: [[1, 0.5, 1], [1.006, 0.1, 0.6], [6.1, 0.06, 0.08]], click: 0.1, clickFrequency: 1800 });
+        },
+
+        // スチールパン：整数倍に近い倍音がにぎやかに鳴り、たたいた瞬間に少し上ずる
+        steelpan(context, out, note, p) {
+            const decay = clamp(1.3 * (262 / note.frequency) ** 0.4, 0.4, 1.6) * (p.decay ?? 1);
+            struck(context, out, note, { decay, bend: 0.02, partials: [[1, 0.42, 1], [2.005, 0.26, 0.7], [3.01, 0.11, 0.4], [4, 0.05, 0.2]], click: 0.04, clickFrequency: 3000 });
+        },
+
+        // フルート：基音の強いやわらかい音に、息の音。breath: 0 で口笛のような澄んだ音になる
+        flute(context, out, note, p) {
+            wind(context, out, note, {
+                partials: [[1, 1], [2, 0.18], [3, 0.06]], peak: 0.28, attack: p.attack ?? 0.06,
+                vibrato: p.vibrato ?? 14, breathLevel: p.breath ?? 0.05, release: p.release ?? 0.12
+            });
+        },
+
+        // オカリナ：フルートより丸く、こもった音
+        ocarina(context, out, note, p) {
+            wind(context, out, note, {
+                partials: [[1, 1], [2, 0.04], [3, 0.08]], peak: 0.3, attack: p.attack ?? 0.04,
+                vibrato: p.vibrato ?? 10, breathLevel: p.breath ?? 0.025, release: p.release ?? 0.1
+            });
+        },
+
+        // クラリネット：奇数倍の倍音が強い、木の管の音
+        clarinet(context, out, note, p) {
+            wind(context, out, note, {
+                wave: clarinetWave(context), peak: 0.16, attack: p.attack ?? 0.05, cutoff: p.cutoff ?? 2600,
+                vibrato: p.vibrato ?? 8, breathLevel: p.breath ?? 0.015, release: p.release ?? 0.1
+            });
+        },
+
+        // オルガン：足し合わせた倍音（ドローバー）をそのまま伸ばす。速い揺れを少し
+        organ(context, out, note, p) {
+            wind(context, out, note, {
+                partials: [[0.5, 0.3], [1, 0.8], [2, 0.5], [3, 0.25], [4, 0.2]], peak: 0.12, attack: 0.008, sustain: 0.95,
+                vibrato: p.vibrato ?? 6, vibratoRate: 6.5, vibratoDelay: 0, release: p.release ?? 0.06
+            });
+        },
+
         // ドラム：kit で音色の組を選ぶ（'soft'・'chip'・'legacy'）。levels でドラムごとの音量を変えられる
         drums(context, out, note, p) {
             const kit = DRUM_KITS[p.kit ?? 'soft'];
@@ -976,11 +1104,21 @@
             send.gain.value = part.delay;
             fader.connect(send).connect(buses.echo.input);
         }
-        return { input, lfos };
+        return { input, lfos, fader };
+    }
+
+    // パートの差し替え：楽器を替えるときは、通り道の設定（音量・左右・送りなど）と書き方だけを元から残す
+    const CHANNEL_KEYS = ['mode', 'octave', 'from', 'center', 'voices', 'transpose', 'volume', 'pan', 'reverb', 'delay', 'cutoff', 'chorus', 'autopan', 'humanize'];
+
+    function partWith(part, override) {
+        if (!override) return part;
+        if (!override.instrument) return { ...part, ...override };
+        const kept = Object.fromEntries(CHANNEL_KEYS.filter(key => key in part).map(key => [key, part[key]]));
+        return { ...kept, ...override };
     }
 
     // 曲ごとのミキサー（曲の音量の出口と、リバーブ・エコー・パートの通り道）
-    function createMixer(context, destination, song, compiled) {
+    function createMixer(context, destination, song, compiled, overrides = {}) {
         const bus = context.createGain();
         bus.gain.value = song.gain ?? 1;
         bus.connect(destination);
@@ -996,7 +1134,7 @@
             }
         }
         const channels = {};
-        for (const [name, part] of Object.entries(song.parts)) channels[name] = createChannel(context, part, { bus, reverb, echo });
+        for (const [name, part] of Object.entries(song.parts)) channels[name] = createChannel(context, partWith(part, overrides[name]), { bus, reverb, echo });
         return {
             bus,
             channels,
@@ -1025,12 +1163,14 @@
 
     class SongPlayback {
         // parts：鳴らすパートの名前の配列（省くと全部。パートごとの音量を測るときに使う）
-        constructor(context, destination, song, { fromStep = 0, startTime = context.currentTime + 0.06, fadeIn = 0, parts = null } = {}) {
+        // overrides：パートの差し替え（{ lead: { instrument: 'flute', volume: 0.8 } } など。試聴ページで主旋律を選ぶとき）
+        constructor(context, destination, song, { fromStep = 0, startTime = context.currentTime + 0.06, fadeIn = 0, parts = null, overrides = {} } = {}) {
             this.context = context;
             this.song = song;
             this.parts = parts;
+            this.overrides = overrides;
             this.compiled = compileSong(song);
-            this.mixer = createMixer(context, destination, song, this.compiled);
+            this.mixer = createMixer(context, destination, song, this.compiled, overrides);
             const gain = song.gain ?? 1;
             if (fadeIn > 0) {
                 this.mixer.bus.gain.setValueAtTime(0, startTime);
@@ -1075,8 +1215,17 @@
             }
         }
 
+        // 鳴らしている途中でパートを差し替える（次の音から変わる。音量はなめらかに変える）
+        setOverrides(overrides) {
+            this.overrides = overrides;
+            const now = this.context.currentTime;
+            for (const [name, part] of Object.entries(this.song.parts)) {
+                this.mixer.channels[name].fader.gain.setTargetAtTime(partWith(part, overrides[name]).volume ?? 1, now, 0.03);
+            }
+        }
+
         playEvent(event, time, stepSeconds) {
-            const part = this.song.parts[event.part];
+            const part = partWith(this.song.parts[event.part], this.overrides[event.part]);
             const instrument = INSTRUMENTS[part.instrument];
             if (!instrument) throw new Error(`楽器がありません: ${part.instrument}`);
             const duration = event.length * stepSeconds * (part.gate ?? 1);
@@ -1222,12 +1371,12 @@
     const EFFECTS_REVERB = { seconds: 1.4, tone: 0.55 };
 
     // 曲を OfflineAudioContext で書き出す（seconds を省くと、イントロとループ1周と余韻）
-    function renderSong(song, { seconds = null, fromStep = 0, sampleRate = 48000, volume = 0.8, parts = null } = {}) {
+    function renderSong(song, { seconds = null, fromStep = 0, sampleRate = 48000, volume = 0.8, parts = null, overrides = {} } = {}) {
         const compiled = compileSong(song);
         const total = seconds ?? (compiled.length - fromStep) * compiled.stepSeconds + 2.5;
         const context = new OfflineAudioContext(2, Math.ceil(total * sampleRate), sampleRate);
         const master = createOutput(context, volume);
-        const playback = new SongPlayback(context, master, song, { fromStep, startTime: 0, parts });
+        const playback = new SongPlayback(context, master, song, { fromStep, startTime: 0, parts, overrides });
         playback.schedule(total);
         return context.startRendering();
     }
@@ -1240,6 +1389,43 @@
         reverb.output.connect(master);
         playEffect(context, master, reverb, definition, 0.01);
         return context.startRendering();
+    }
+
+    // 書き出した音の大きさ（統合ラウドネス、LUFS）。K 特性の係数は 48kHz のもの（ほかの周波数でも目安にはなる）
+    function loudness(buffer) {
+        const filters = [
+            { b: [1.53512485958697, -2.69169618940638, 1.19839281085285], a: [-1.69065929318241, 0.73248077421585] },
+            { b: [1, -2, 1], a: [-1.99004745483398, 0.99007225036621] }
+        ];
+        const size = Math.floor(buffer.sampleRate * 0.4);
+        const hop = Math.floor(buffer.sampleRate * 0.1);
+        const sums = [];
+        for (let c = 0; c < buffer.numberOfChannels; c++) {
+            let data = buffer.getChannelData(c);
+            for (const { b, a } of filters) {
+                const out = new Float32Array(data.length);
+                let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+                for (let i = 0; i < data.length; i++) {
+                    const y = b[0] * data[i] + b[1] * x1 + b[2] * x2 - a[0] * y1 - a[1] * y2;
+                    x2 = x1; x1 = data[i]; y2 = y1; y1 = y;
+                    out[i] = y;
+                }
+                data = out;
+            }
+            const sum = new Float64Array(data.length + 1);
+            for (let i = 0; i < data.length; i++) sum[i + 1] = sum[i] + data[i] * data[i];
+            sums.push(sum);
+        }
+        const toLufs = (power) => -0.691 + 10 * Math.log10(power || 1e-12);
+        const blocks = [];
+        for (let start = 0; start + size <= buffer.length; start += hop) {
+            blocks.push(sums.reduce((total, sum) => total + (sum[start + size] - sum[start]) / size, 0));
+        }
+        const loud = blocks.filter(power => toLufs(power) > -70);
+        if (loud.length === 0) return -Infinity;
+        const gate = toLufs(loud.reduce((a, b) => a + b, 0) / loud.length) - 10;
+        const kept = loud.filter(power => toLufs(power) > gate);
+        return toLufs(kept.reduce((a, b) => a + b, 0) / kept.length);
     }
 
     // ===== ゲームから使う入口 =====
@@ -1266,7 +1452,7 @@
         const state = {
             context: null, master: null, bgmBus: null, effectsBus: null, effectsReverb: null,
             settings: loadSettings(), listeners: new Set(),
-            bgmName: null, bgmFromStep: 0, playback: null, timer: null, buffers: new Map(), loading: new Map()
+            bgmName: null, bgmFromStep: 0, overrides: {}, playback: null, timer: null, buffers: new Map(), loading: new Map()
         };
 
         function loadSettings() {
@@ -1369,7 +1555,7 @@
                 }).catch(() => {});
                 return;
             }
-            state.playback = Object.assign(new SongPlayback(state.context, state.bgmBus, song, { fromStep: state.bgmFromStep, fadeIn: previous ? 0.15 : 0 }), { name });
+            state.playback = Object.assign(new SongPlayback(state.context, state.bgmBus, song, { fromStep: state.bgmFromStep, fadeIn: previous ? 0.15 : 0, overrides: state.overrides[name] ?? {} }), { name });
             state.playback.schedule(state.context.currentTime + LOOKAHEAD_SEC);
             if (!state.timer) {
                 state.timer = setInterval(() => {
@@ -1457,6 +1643,11 @@
             getSettings,
             setSettings,
             // 音量を変える（{ master, bgm, effects } のうち、変えたいものだけ）
+            // 曲のパートを差し替える（{ lead: { instrument: 'flute', volume: 0.8 } }。{} で元に戻す）。流れていれば次の音から変わる
+            setOverrides(name, overrides) {
+                state.overrides[name] = overrides;
+                if (state.playback && state.playback.name === name && !state.playback.stopped && state.playback.setOverrides) state.playback.setOverrides(overrides);
+            },
             setVolume(next) {
                 Object.assign(levels, next);
                 if (!state.context) return;
@@ -1502,6 +1693,7 @@
         renderSong,
         renderEffect,
         effectLength,
+        loudness,
         parseSequence,
         parseChord,
         noteToMidi,

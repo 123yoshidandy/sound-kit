@@ -18,8 +18,9 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const NAMES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
-export function loadKit(files) {
-    const context = vm.createContext({ console });
+// sandbox：本体から見えるグローバル（テストで、偽の OfflineAudioContext を置くときに使う）
+export function loadKit(files, sandbox = {}) {
+    const context = vm.createContext(Object.assign(sandbox, { console }));
     context.globalThis = context;
     vm.runInContext(fs.readFileSync(path.join(ROOT, 'src/sound-kit.js'), 'utf8'), context);
     files.forEach(file => vm.runInContext(fs.readFileSync(path.resolve(ROOT, file), 'utf8'), context));

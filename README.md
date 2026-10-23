@@ -7,7 +7,7 @@
 - 配り方は netplay-kit と同じ「コピーして同期」です（npm パッケージや git submodule にはしない）
 
 試聴ページ：https://123yoshidandy.github.io/sound-kit/
-曲・効果音・楽器をボタンで鳴らして聞き比べられます。曲は区間（イントロ・A・B …）を押すと、そこから鳴ります。
+曲・効果音・楽器をボタンで鳴らして聞き比べられます。曲は区間（イントロ・A・B …）を押すと、そこから鳴ります。曲ごとに主旋律の楽器を替えられます（音量は、元の楽器と同じ大きさに自動でそろえる）。
 
 ## フォルダ構成
 
@@ -15,7 +15,7 @@
 - `src/sound-kit.mjs`：ES モジュールから使うための入口
 - `games/<ゲーム名>.js`：ゲームごとの曲と効果音（`SoundKit.register('<ゲーム名>', { songs, effects })`）
 - `games/<ゲーム名>-legacy.js`：今の音を同じ形に移したもの（試聴ページで聞き比べるため。ゲームには配らない）
-- `index.html`・`audition/`：試聴ページ（GitHub Pages）
+- `index.html`・`audition/`：試聴ページ（GitHub Pages）。楽器の一覧と主旋律の候補は `audition/instruments.js`
 - `docs/composing.md`：作曲の作法（音域・パートの役割・ループのつなぎ方・音量の目安・記法）
 - `tools/measure.mjs`：曲と効果音を書き出して、音量と音割れを数値で確かめる（ヘッドレス Chrome）
 - `tools/lint-songs.mjs`：和声の書き間違い（避けたい音・半音のぶつかり）と、パートの音域を調べる
@@ -47,6 +47,7 @@ sound.toggleAll();             // どちらかが鳴っていれば両方消し�
 sound.getSettings();           // { effects: true, bgm: true }
 sound.onChange((settings) => updateButtons(settings));
 sound.setVolume({ bgm: 0.8 }); // 音量（master・bgm・effects。既定は 0.8・1・1）
+sound.setOverrides('pixel', { lead: { instrument: 'flute', volume: 0.5 } }); // パートの楽器を差し替える（{} で元に戻す）
 ```
 
 `createPlayer` の `volume` で、最初の音量も決められます。音声ファイルの曲は `{ file: 'sounds/bgm.m4a', gain, loopStart, loopEnd }`、効果音は `{ file: 'sounds/pop.mp3', volume, rate }` と書きます（`sound.preload()` で前もって読み込めます）。
@@ -85,7 +86,11 @@ const song = {
 };
 ```
 
-楽器は `marimba`・`vibes`・`bell`・`epiano`・`pluck`・`pad`・`synthBass`・`softLead`・`chip`・`drums`（組は `soft`・`chip`・`legacy`）です。試聴ページの「楽器」で鳴らせます。
+楽器は次のとおりです。試聴ページの「楽器」で鳴らせます。
+
+- たたく・はじく：`marimba`・`xylophone`・`vibes`・`bell`・`musicBox`（オルゴール）・`kalimba`・`steelpan`・`epiano`・`pluck`（`brightness` を上げるとハープ）
+- 伸ばす：`flute`（`breath: 0` で口笛）・`ocarina`・`clarinet`・`organ`・`softLead`・`pad`
+- そのほか：`synthBass`・`chip`（矩形波・三角波）・`drums`（組は `soft`・`chip`・`legacy`）
 
 ## 同期
 

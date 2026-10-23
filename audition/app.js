@@ -21,6 +21,61 @@
     const player = SoundKit.createPlayer({ songs, effects, ignoreSilentSwitch: true });
     player.setup();
 
+    // ===== 音量をそろえる =====
+    // 書き出して測った大きさ（LUFS）で合わせる。書き出すだけなので、音は鳴らない
+
+    const DEMO_LEVEL = -34;  // 楽器のフレーズの大きさ
+    const CHIP_TRIM = -5;    // 矩形波は、同じ数値でも大きく聞こえるので、その分小さくする
+
+    function perceivedTrim(preset) {
+        return preset.instrument === 'chip' && preset.wave !== 'triangle' ? CHIP_TRIM : 0;
+    }
+
+    const dbToGain = (db) => 10 ** (db / 20);
+    const demoGains = new Map();
+
+    async function demoGain(item) {
+        if (!demoGains.has(item.id)) {
+            const buffer = await SoundKit.renderEffect(instruments.effects[item.id]);
+            demoGains.set(item.id, dbToGain(DEMO_LEVEL + perceivedTrim(item.preset) - SoundKit.loudness(buffer)));
+        }
+        return demoGains.get(item.id);
+    }
+
+    // 主旋律のパートを、別の楽器に差し替えたときの音量（元の楽器と同じ大きさに聞こえるように）
+    const leadLevels = new Map();
+
+    async function partLoudness(id, partName, override) {
+        const key = `${id}:${partName}:${JSON.stringify(override ?? null)}`;
+        if (!leadLevels.has(key)) {
+            const song = songs[id];
+            const compiled = SoundKit.compileSong(song);
+            // そのパートが鳴る最初の区間だけを書き出す
+            const first = compiled.events.find(event => event.part === partName);
+            const section = compiled.sections.find(s => first.start >= s.start && first.start < s.start + s.length);
+            const buffer = await SoundKit.renderSong(song, {
+                fromStep: section.start, seconds: section.length * compiled.stepSeconds,
+                parts: [partName], overrides: override ? { [partName]: override } : {}
+            });
+            leadLevels.set(key, SoundKit.loudness(buffer));
+        }
+        return leadLevels.get(key);
+    }
+
+    async function leadOverrides(id, preset) {
+        const song = songs[id];
+        const overrides = {};
+        for (const partName of song.melody) {
+            const original = song.parts[partName];
+            const volume = original.volume ?? 1;
+            const before = await partLoudness(id, partName, null);
+            const after = await partLoudness(id, partName, { ...preset, volume });
+            const trim = perceivedTrim(preset) - perceivedTrim(original);
+            overrides[partName] = { ...preset, volume: volume * dbToGain(before - after + trim) };
+        }
+        return overrides;
+    }
+
     // ===== タブ =====
 
     document.querySelectorAll('.tab').forEach(tab => {
@@ -52,7 +107,8 @@
                 </div>
             </div>
             <div class="sections"></div>
-            <div class="now"><span class="where"></span><span class="time"></span></div>`;
+            <div class="now"><span class="where"></span><span class="time"></span></div>
+            <label class="lead">主旋律<select></select></label>`;
         card.querySelector('h2').textContent = song.title;
         card.querySelector('.song-title p').textContent = song.description;
         const info = `テンポ ${song.bpm}・ループ ${formatTime(loopSeconds)}`;
@@ -73,9 +129,50 @@
             if (player.position()?.name === id) player.stopBgm();
             else player.playBgm(id);
         });
+        setupLeadSelect(card.querySelector('.lead'), id, song);
         bgmPanel.appendChild(card);
         cards.set(id, { card, segments, compiled, info });
     });
+
+    // 主旋律の楽器を選ぶ（流れていれば、止めずに次の音から変わる）
+    function setupLeadSelect(label, id, song) {
+        if (!song.melody) {
+            label.remove();
+            return;
+        }
+        const select = label.querySelector('select');
+        const original = song.parts[song.melody[0]];
+        const originalName = INSTRUMENTS.find(item => sameInstrument(item.preset, original))?.name ?? original.instrument;
+        select.innerHTML = `<option value="">元の楽器（${originalName}）</option>`;
+        INSTRUMENTS.filter(item => item.lead).forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = item.name;
+            select.appendChild(option);
+        });
+        let request = 0;
+        select.addEventListener('change', async () => {
+            const mine = ++request;
+            const item = INSTRUMENTS.find(i => i.id === select.value);
+            if (!item) {
+                player.setOverrides(id, {});
+                return;
+            }
+            select.disabled = true;
+            try {
+                const overrides = await leadOverrides(id, item.preset);
+                if (mine === request) player.setOverrides(id, overrides);
+            } finally {
+                select.disabled = false;
+            }
+        });
+    }
+
+    function sameInstrument(preset, part) {
+        if (preset.instrument !== part.instrument) return false;
+        if (part.instrument !== 'chip') return true;
+        return (preset.wave ?? 'square') === (part.wave ?? 'square') && (preset.duty ?? 0.25) === (part.duty ?? 0.25);
+    }
 
     // 再生中の位置を、区間の帯と文字で見せる
     function render() {
@@ -139,7 +236,7 @@
         button.innerHTML = '<strong></strong><span></span>';
         button.querySelector('strong').textContent = item.name;
         button.querySelector('span').textContent = item.note;
-        button.addEventListener('click', () => player.play(`instrument:${item.id}`));
+        button.addEventListener('click', async () => player.play(`instrument:${item.id}`, { volume: await demoGain(item) }));
         grid.appendChild(button);
     });
     document.querySelector('#instruments').appendChild(grid);
@@ -152,5 +249,5 @@
     effectsVolume.addEventListener('input', () => player.setVolume({ effects: Number(effectsVolume.value) }));
 
     // 確認用（ヘッドレスのブラウザから触る）
-    window.audition = { player, songs, effects };
+    window.audition = { player, songs, effects, demoGain, leadOverrides };
 })();

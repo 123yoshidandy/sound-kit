@@ -12,6 +12,7 @@
     const pixel = {
         title: 'ピクセル・ステップ',
         description: 'チップチューン・軽快',
+        melody: ['lead', 'leadB'],   // 主旋律のパート（試聴ページで楽器を替えられる）
         bpm: 132,
         gain: 0.127,
         reverb: { seconds: 1.2, tone: 0.4 },
@@ -125,6 +126,7 @@
     const hidamari = {
         title: 'ひだまりパズル',
         description: 'マリンバとベル・明るい',
+        melody: ['lead'],
         bpm: 110,
         swing: 0.08,
         gain: 0.06,
@@ -227,6 +229,7 @@
     const yofuke = {
         title: '夜更けのロジック',
         description: 'エレピとシンセ・落ち着いた',
+        melody: ['lead'],
         bpm: 84,
         swing: 0.1,
         swingUnit: 2,
@@ -321,6 +324,7 @@
     const neon = {
         title: 'ネオンタイル',
         description: 'チップ×シンセポップ',
+        melody: ['lead'],
         bpm: 120,
         gain: 0.129,
         reverb: { seconds: 2, tone: 0.55 },

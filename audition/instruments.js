@@ -10,6 +10,7 @@
     const CHIP = (duty, extra = {}) => ({ instrument: 'chip', wave: 'pulse', duty, level: 0.2, vibrato: 14, sustain: 0.6, ...extra });
 
     const LIST = [
+        { id: 'piano', group: '鍵盤', name: 'ピアノ', note: '弦をハンマーでたたく', instrument: 'piano', lead: true },
         { id: 'marimba', group: 'たたく・はじく', name: 'マリンバ', note: '木の板をたたく', instrument: 'marimba', lead: true },
         { id: 'xylophone', group: 'たたく・はじく', name: 'シロフォン', note: '硬く短い木の板', instrument: 'xylophone', lead: true },
         { id: 'vibes', group: 'たたく・はじく', name: 'ビブラフォン', note: '金属の板・揺れ', instrument: 'vibes', lead: true },
@@ -17,14 +18,14 @@
         { id: 'musicBox', group: 'たたく・はじく', name: 'オルゴール', note: '細い金属の歯', instrument: 'musicBox', lead: true },
         { id: 'kalimba', group: 'たたく・はじく', name: 'カリンバ', note: '丸い金属の歯', instrument: 'kalimba', lead: true },
         { id: 'steelpan', group: 'たたく・はじく', name: 'スチールパン', note: '南国の金属の鍋', instrument: 'steelpan', lead: true },
-        { id: 'epiano', group: 'たたく・はじく', name: 'エレピ', note: 'FM・電気ピアノ', instrument: 'epiano', lead: true },
+        { id: 'epiano', group: '鍵盤', name: 'エレピ', note: 'FM・電気ピアノ', instrument: 'epiano', lead: true },
         { id: 'harp', group: 'たたく・はじく', trim: -3, name: 'ハープ', note: '明るくはじく弦', instrument: { instrument: 'pluck', brightness: 0.75, sustain: 0.997 }, lead: true },
         { id: 'pluck', group: 'たたく・はじく', trim: -3, name: 'はじく弦', note: 'やわらかい弦', instrument: 'pluck', lead: true },
         { id: 'flute', group: '伸ばす', name: 'フルート', note: '息の音・ビブラート', instrument: 'flute', lead: true },
         { id: 'whistle', group: '伸ばす', name: '口笛', note: '澄んだサイン波', instrument: { instrument: 'flute', breath: 0, vibrato: 18 }, lead: true },
         { id: 'ocarina', group: '伸ばす', name: 'オカリナ', note: '丸くこもった笛', instrument: 'ocarina', lead: true },
         { id: 'clarinet', group: '伸ばす', name: 'クラリネット', note: '木の管・奇数倍音', instrument: 'clarinet', lead: true },
-        { id: 'organ', group: '伸ばす', name: 'オルガン', note: '倍音を足した持続音', instrument: 'organ', lead: true },
+        { id: 'organ', group: '鍵盤', name: 'オルガン', note: '倍音を足した持続音', instrument: 'organ', lead: true },
         { id: 'softLead', group: '伸ばす', name: 'シンセリード', note: 'やわらかい・ビブラート', instrument: 'softLead', lead: true },
         { id: 'chip25', group: 'チップ', trim: -5, name: 'チップ 25%', note: '矩形波・ファミコン風', instrument: CHIP(0.25), lead: true },
         { id: 'chip12', group: 'チップ', trim: -5, name: 'チップ 12.5%', note: '細い矩形波', instrument: CHIP(0.125, { vibrato: 16 }), lead: true },
@@ -36,7 +37,7 @@
         { id: 'chipDrums', group: 'チップ', name: 'ドラム（チップ）', note: '雑音と三角波', instrument: { instrument: 'drums', kit: 'chip' }, notes: 'kick:2 hat snare hat kick kick snare openHat', unit: 0.12 }
     ];
 
-    const GROUPS = ['たたく・はじく', '伸ばす', 'チップ', '伴奏・ドラム'];
+    const GROUPS = ['鍵盤', 'たたく・はじく', '伸ばす', 'チップ', '伴奏・ドラム'];
     LIST.sort((a, b) => GROUPS.indexOf(a.group) - GROUPS.indexOf(b.group));
 
     const effects = {};

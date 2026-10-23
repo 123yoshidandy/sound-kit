@@ -17,7 +17,26 @@
     const INSTRUMENTS = instruments.list;
     INSTRUMENTS.forEach(item => { effects[`instrument:${item.id}`] = instruments.effects[item.id]; });
 
+    // ゲームに縛らない曲の一覧（games/catalog.<曲名>.js）。曲の id は catalog/<曲名> にする
+    const catalogSongs = (() => {
+        try {
+            return SoundKit.library('catalog').songs;
+        } catch {
+            return {};
+        }
+    })();
     const songs = { ...current.songs, legacy: legacy.songs.legacy };
+    Object.entries(catalogSongs).forEach(([id, song]) => { songs[`catalog/${id}`] = song; });
+
+    // BGM のタブの見出し。曲の一覧はジャンル別（この順に並べ、ここにないジャンルは最後）
+    const GENRES = ['クラシック', 'ジャズ・ブルース', 'ファンク・ソウル', 'ロック・ポップ', 'ラテン', 'ワールド', 'ゲーム音楽', 'アンビエント', 'エレクトロ'];
+    const genreOf = (song) => song.genre ?? 'そのほか';
+    const genres = [...new Set(Object.values(catalogSongs).map(genreOf))]
+        .sort((a, b) => (GENRES.indexOf(a) + 1 || 99) - (GENRES.indexOf(b) + 1 || 99));
+    const SONG_GROUPS = [
+        { title: `${GAME} の候補`, ids: [...Object.keys(current.songs), 'legacy'] },
+        ...genres.map(genre => ({ title: genre, ids: Object.keys(catalogSongs).filter(id => genreOf(catalogSongs[id]) === genre).map(id => `catalog/${id}`) }))
+    ];
     const player = SoundKit.createPlayer({ songs, effects, ignoreSilentSwitch: true });
     player.setup();
 
@@ -94,7 +113,15 @@
     const cards = new Map();
 
     const bgmPanel = document.querySelector('#bgm');
-    Object.entries(songs).forEach(([id, song]) => {
+    SONG_GROUPS.forEach(({ title, ids }) => {
+        const heading = document.createElement('h2');
+        heading.className = 'group';
+        heading.textContent = title;
+        bgmPanel.appendChild(heading);
+        ids.forEach(id => createCard(id, songs[id]));
+    });
+
+    function createCard(id, song) {
         const compiled = SoundKit.compileSong(song);
         const card = document.createElement('article');
         card.className = 'song' + (id === 'legacy' ? ' is-reference' : '');
@@ -133,7 +160,7 @@
         setupLeadSelect(card.querySelector('.lead'), id, song);
         bgmPanel.appendChild(card);
         cards.set(id, { card, segments, compiled, info });
-    });
+    }
 
     // 主旋律の楽器を選ぶ（流れていれば、止めずに次の音から変わる）
     function setupLeadSelect(label, id, song) {

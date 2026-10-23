@@ -811,6 +811,39 @@
             osc.stop(stop + 0.02);
         },
 
+        // ピアノ：弦の倍音を重ねる。高い倍音ほど少し高めにずれ（弦の硬さ）、速く消える。強く弾くほど明るい
+        // 2本の弦のわずかなずれでうなりを出し、ハンマーの当たる音を足す。鍵盤を離すとダンパーで止まる
+        piano(context, out, note, p) {
+            const { time, frequency, velocity, duration } = note;
+            const decay = clamp(5 * (262 / frequency) ** 0.6, 0.7, 9) * (p.decay ?? 1);
+            const end = time + Math.max(duration, 0.05);
+            const release = p.release ?? 0.18;
+            const inharmonicity = 0.0004;
+            const brightness = (p.brightness ?? 1) * (0.5 + 0.5 * velocity);
+            for (let n = 1; n <= 7; n++) {
+                const partial = frequency * n * Math.sqrt(1 + inharmonicity * n * n);
+                if (partial > context.sampleRate * 0.45) break;
+                const level = (0.42 / n ** 1.1) * velocity * (n === 1 ? 1 : brightness ** (n - 1));
+                const partialDecay = decay / (1 + 0.55 * (n - 1));
+                // 基音だけは2本の弦にして、わずかにずらす（うなり）
+                const detunes = n === 1 ? [-1.5, 1.5] : [0];
+                detunes.forEach(detune => {
+                    const osc = oscillator(context, 'sine', partial, time);
+                    osc.detune.value = detune;
+                    const gain = context.createGain();
+                    const peak = level / detunes.length;
+                    gain.gain.setValueAtTime(0, time);
+                    gain.gain.linearRampToValueAtTime(peak, time + 0.003);
+                    gain.gain.setTargetAtTime(0, time + 0.003, partialDecay / 4.6);
+                    gain.gain.setTargetAtTime(0, end, release / 4.6);
+                    osc.connect(gain).connect(out);
+                    osc.start(time);
+                    osc.stop(Math.min(end + release * 1.5, time + partialDecay * 1.5) + 0.02);
+                });
+            }
+            noiseBurst(context, out, time, { duration: 0.02, peak: 0.05 * velocity * brightness, type: 'lowpass', frequency: Math.min(frequency * 8, 5000) });
+        },
+
         // シロフォン：マリンバより硬く、短い。倍音は3倍
         xylophone(context, out, note, p) {
             const decay = clamp(0.6 * (262 / note.frequency) ** 0.6, 0.1, 0.9) * (p.decay ?? 1);

@@ -14,6 +14,7 @@
 - `src/sound-kit.js`：本体（普通の `<script>` で読むと `window.SoundKit` になる）
 - `src/sound-kit.mjs`：ES モジュールから使うための入口
 - `games/<ゲーム名>.js`：ゲームごとの曲と効果音（`SoundKit.register('<ゲーム名>', { songs, effects })`）
+- `games/catalog.<曲名>.js`：ゲームに縛らない曲の一覧（`SoundKit.register('catalog', …)`。曲に `genre` を書くと、試聴ページでジャンル別に並ぶ）。ゲームで使うときは、そのゲームの `games/<ゲーム名>.js` に写す
 - `games/<ゲーム名>.<曲名>.js`：曲の候補（同じ名前で `SoundKit.register` を呼ぶと、曲が足し合わされる）。試聴ページでは `index.html` に読み込みを足す。ゲームには配らないので、曲が決まったら `games/<ゲーム名>.js` に移す
 - `games/<ゲーム名>-legacy.js`：今の音を同じ形に移したもの（試聴ページで聞き比べるため。ゲームには配らない）
 - `index.html`・`audition/`：試聴ページ（GitHub Pages）。楽器の一覧と主旋律の候補は `audition/instruments.js`
@@ -89,8 +90,9 @@ const song = {
 
 楽器は次のとおりです。試聴ページの「楽器」で鳴らせます。
 
-- たたく・はじく：`marimba`・`xylophone`・`vibes`・`bell`・`musicBox`（オルゴール）・`kalimba`・`steelpan`・`epiano`・`pluck`（`brightness` を上げるとハープ）
-- 伸ばす：`flute`（`breath: 0` で口笛）・`ocarina`・`clarinet`・`organ`・`softLead`・`pad`
+- 鍵盤：`piano`・`epiano`・`organ`
+- たたく・はじく：`marimba`・`xylophone`・`vibes`・`bell`・`musicBox`（オルゴール）・`kalimba`・`steelpan`・`pluck`（`brightness` を上げるとハープ）
+- 伸ばす：`flute`（`breath: 0` で口笛）・`ocarina`・`clarinet`・`softLead`・`pad`
 - そのほか：`synthBass`・`chip`（矩形波・三角波）・`drums`（組は `soft`・`chip`・`legacy`）
 
 ## 同期

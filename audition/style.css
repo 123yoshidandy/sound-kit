@@ -96,7 +96,7 @@ button {
 }
 
 main {
-    max-width: 640px;
+    max-width: 1280px;
     margin: 18px auto 0;
     padding: 0 16px;
 }
@@ -111,12 +111,26 @@ main {
 
 /* ===== BGM ===== */
 
+/* 曲のカードは、幅 320px 以上で入るだけ横に並べる（スマホでは1列） */
+.song-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
 .song {
+    min-width: 0;
     background: var(--card);
     border: 1px solid var(--card-line);
     border-radius: 16px;
     padding: 14px;
-    margin-bottom: 14px;
+}
+
+/* 効果音は表なので、広い画面でも幅を広げない */
+#effects {
+    max-width: 608px;
+    margin: 0 auto;
 }
 
 .song-head {
@@ -341,7 +355,7 @@ main {
     }
 
     .instrument-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
     }
 }
 

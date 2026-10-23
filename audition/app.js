@@ -115,11 +115,14 @@
         const heading = document.createElement('h2');
         heading.className = 'group';
         heading.textContent = title;
-        bgmPanel.appendChild(heading);
-        ids.forEach(id => createCard(id, songs[id]));
+        // ジャンルの中の曲は、画面の幅に合わせて横にも並べる
+        const grid = document.createElement('div');
+        grid.className = 'song-grid';
+        bgmPanel.append(heading, grid);
+        ids.forEach(id => createCard(id, songs[id], grid));
     });
 
-    function createCard(id, song) {
+    function createCard(id, song, container) {
         const compiled = SoundKit.compileSong(song);
         const card = document.createElement('article');
         card.className = 'song' + (id === 'legacy' ? ' is-reference' : '');
@@ -156,7 +159,7 @@
             else player.playBgm(id);
         });
         setupLeadSelect(card.querySelector('.lead'), id, song);
-        bgmPanel.appendChild(card);
+        container.appendChild(card);
         cards.set(id, { card, segments, compiled, info });
     }
 

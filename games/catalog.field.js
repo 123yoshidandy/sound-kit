@@ -1,6 +1,6 @@
 /**
  * 曲の一覧：はじまりの草原（RPG のフィールドの曲。冒険に出る、広がりのある明るい曲）
- * 弦やブラスの代わりに、パッドとはじく弦・ベル・ティンパニ風のタムで広がりを出す
+ * ハープ（はじく弦）とティンパニ風のタムを土台に、B からは弦楽器を敷き、区間の頭でブラスが合いの手を入れる
  */
 (function () {
     const { repeat } = SoundKit;
@@ -24,11 +24,16 @@
     const HARP = '0:2 1 2 3 2 1 2 1';
     const BASS = 'R:6 5:2 8:4 5:4';
 
+    // 区間の頭だけで鳴らすシンバル
+    const CRASH = 'x...............|' + repeat('................', 7, '|');
+
     const DRUMS_A = {
         kick: repeat('x.......x.......', 8, '|'),
         shaker: repeat('..o...o...o...o.', 8, '|'),
         tom: repeat('................', 7, '|') + '|........x...x.x.'
     };
+    // A'：終わりに小太鼓のフィルを入れて、B へ渡す
+    const DRUMS_A2 = { ...DRUMS_A, snare: repeat('................', 7, '|') + '|..........o.o.xx' };
     // 最後の A と A'：小太鼓を軽く足して、行進のように
     const DRUMS_MARCH = {
         kick: repeat('x.......x.......', 8, '|'),
@@ -36,6 +41,8 @@
         shaker: repeat('..o...o...o...o.', 8, '|'),
         tom: repeat('................', 7, '|') + '|........x...x.x.'
     };
+    // ループの終わり：小太鼓のフィルで頭へ戻る
+    const DRUMS_LOOP_END = { ...DRUMS_MARCH, snare: repeat('....x.......x...', 7, '|') + '|....x.....o.oxxx' };
 
     const field = {
         title: 'はじまりの草原',
@@ -43,7 +50,7 @@
         genre: 'ゲーム音楽',
         melody: ['lead'],   // 主旋律のパート（試聴ページで楽器を替えられる）
         bpm: 120,
-        gain: 0.051,
+        gain: 0.055,
         reverb: { seconds: 2.8, tone: 0.5 },
         delay: { time: 0.75, feedback: 0.25, tone: 2400, reverb: 0.3 },
         humanize: { time: 0.005, velocity: 0.07 },
@@ -54,16 +61,23 @@
             harp: { instrument: 'pluck', mode: 'arp', from: 'D4', brightness: 0.75, sustain: 0.997, volume: 1.1, pan: 0.28, reverb: 0.3, delay: 0.1 },
             // 弦の代わりのパッド。左右にゆっくり揺らして広げる
             pad: { instrument: 'pad', mode: 'chords', center: 'E4', voices: 4, volume: 0.25, cutoff: 1300, reverb: 0.45, chorus: { depth: 0.003, rate: 0.4, mix: 0.45 }, autopan: { rate: 0.15, depth: 0.25 } },
+            // 弦楽器：B からパッドに替えて和音を敷く
+            strings: { instrument: 'strings', mode: 'chords', center: 'E4', voices: 4, volume: 0.38, pan: -0.2, attack: 0.4, release: 0.6, brightness: 0.8, reverb: 0.45 },
+            // 弦の対旋律：メロディの下を、長い音でゆっくり動く
+            counter: { instrument: 'strings', volume: 0.72, pan: 0.25, attack: 0.25, brightness: 0.7, reverb: 0.4 },
+            // ブラス：区間の頭で短く和音を吹く合いの手
+            brass: { instrument: 'brass', mode: 'chords', center: 'A4', voices: 3, volume: 0.38, pan: 0.15, brightness: 4, reverb: 0.35, delay: 0.05 },
             bass: { instrument: 'pluck', mode: 'bass', octave: 2, brightness: 0.4, sustain: 0.995, release: 0.12, volume: 1.1, gate: 0.9 },
             // ドラム：tom をティンパニに見立てる
-            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.8, levels: { kick: 0.7, snare: 0.35, shaker: 0.45, tom: 0.85 }, reverb: 0.2 }
+            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.8, levels: { kick: 0.7, snare: 0.35, shaker: 0.45, tom: 0.85, crash: 0.5 }, reverb: 0.2 }
         },
         sections: {
-            // イントロ：パッドとティンパニで幕を開け、ハープが入って A7 で止まる
+            // イントロ：パッドとティンパニで幕を開け、ハープとブラスが入って A7 で止まる
             intro: {
                 label: 'イントロ',
                 chords: 'D | G | Em7 | A7sus4:8 A7:8',
                 pad: 'hold',
+                brass: '................|................|x-------........|x--.x--.x---x---',
                 harp: `r:16 | r:16 | ${HARP} | ${HARP}`,
                 bass: 'R:16',
                 drums: { tom: 'x...............|x...............|x.......x.......|x...x...x.x.x.xx' }
@@ -73,7 +87,7 @@
                 lead: `${THEME_HEAD} | ${THEME_HALF}`,
                 harp: HARP,
                 bass: BASS,
-                drums: DRUMS_A
+                drums: { ...DRUMS_A, crash: CRASH }
             },
             // A'：パッドを敷く
             A2: {
@@ -83,17 +97,20 @@
                 harp: HARP,
                 pad: 'hold',
                 bass: BASS,
-                drums: DRUMS_A
+                drums: DRUMS_A2
             },
-            // B：長い音で大きく歌う。ティンパニが拍を刻む
+            // B：長い音で大きく歌う。ティンパニが拍を刻む。弦に替え、対旋律とブラスを足す
             B: {
                 chords: 'G | A | F#m7 | Bm | Em7 | F#m7 | G | A',
                 lead: `B5:8 D6:4 B5:4 | C#6:8 A5:4 E5:4 | F#5:8 A5:4 C#6:4 | B5:12 A5:2 B5:2 |
                        G5:8 B5:4 D6:4 | C#6:8 A5:4 F#5:4 | B5:6 A5:2 G5:4 B5:4 | A5:12 r:4`,
+                counter: 'D4:8 B3:8 | C#4:8 E4:8 | F#4:8 E4:8 | D4:16 | E4:8 G4:8 | F#4:8 A4:8 | G4:8 B4:8 | A4:8 E4:4 C#4:4',
+                brass: 'x-----..........|' + repeat('................', 3, '|') + '|x-----..........|' + repeat('................', 3, '|'),
                 harp: HARP,
-                pad: 'hold',
+                strings: 'hold',
                 bass: 'R:8 5:8',
                 drums: {
+                    crash: CRASH,
                     kick: repeat('x...............', 8, '|'),
                     tom: repeat('........x...x...', 7, '|') + '|x...x...x.x.x.xx'
                 }
@@ -109,27 +126,29 @@
                 bass: 'R:8 5:8',
                 drums: { tom: repeat('................', 7, '|') + '|........o...o.o.' }
             },
-            // 最後の A：ベルが答え、小太鼓を足す
+            // 最後の A：ベルが答え、小太鼓を足す。弦を敷き、ブラスが頭と終わりで吹く
             A3: {
                 label: 'A',
                 chords: A_CHORDS,
                 lead: `${THEME_HEAD} | ${THEME_HALF}`,
                 bell: BELL,
+                brass: 'x-----..........|' + repeat('................', 6, '|') + '|x--.x--.........',
                 harp: HARP,
-                pad: 'hold',
+                strings: 'hold',
                 bass: BASS,
-                drums: DRUMS_MARCH
+                drums: { ...DRUMS_MARCH, crash: CRASH }
             },
-            // ループの終わり：A7 で終えて、頭の D へ戻る
+            // ループの終わり：弦の対旋律が下りてきて、A7 で終えて頭の D へ戻る
             A4: {
                 label: "A'",
                 chords: A4_CHORDS,
                 lead: `${THEME_HEAD} | ${THEME_LOOP_END}`,
                 bell: 'r:16 | r:16 | r:16 | r:8 D6:2 B5:2 G5:4 | r:16 | r:16 | r:16 | r:16',
+                counter: 'D4:16 | C#4:16 | B3:16 | B3:8 D4:8 | E4:8 G4:8 | E4:8 C#4:8 | D4:8 F#4:8 | D4:8 C#4:8',
                 harp: HARP,
-                pad: 'hold',
+                strings: 'hold',
                 bass: BASS,
-                drums: DRUMS_MARCH
+                drums: DRUMS_LOOP_END
             }
         },
         intro: ['intro'],

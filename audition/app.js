@@ -28,13 +28,14 @@
     const songs = { ...current.songs, legacy: legacy.songs.legacy };
     Object.entries(catalogSongs).forEach(([id, song]) => { songs[`catalog/${id}`] = song; });
 
-    // BGM のタブの見出し。全曲をジャンル別に並べる（この順に並べ、ここにないジャンルは最後。今の BGM はそのジャンルの最後）
+    // BGM のタブの曲の並び。見出しは付けず、似た曲が近くに並ぶようにジャンルの順で並べる（今の BGM は最後）
     const GENRES = ['チップチューン', 'ゲーム音楽', 'クラシック', 'ジャズ・ブルース', 'ファンク・ソウル', 'ロック・ポップ', 'ラテン', 'ワールド', 'アンビエント', 'エレクトロ'];
-    const genreOf = (song) => song.genre ?? 'そのほか';
-    const songIds = [...Object.keys(songs).filter(id => id !== 'legacy'), 'legacy'];
-    const SONG_GROUPS = [...new Set(songIds.map(id => genreOf(songs[id])))]
-        .sort((a, b) => (GENRES.indexOf(a) + 1 || 99) - (GENRES.indexOf(b) + 1 || 99))
-        .map(genre => ({ title: genre, ids: songIds.filter(id => genreOf(songs[id]) === genre) }));
+    const genreRank = (song) => GENRES.indexOf(song.genre) + 1 || 99;
+    const songIds = Object.keys(songs).filter(id => id !== 'legacy')
+        .map((id, index) => ({ id, index }))
+        .sort((a, b) => genreRank(songs[a.id]) - genreRank(songs[b.id]) || a.index - b.index)
+        .map(({ id }) => id)
+        .concat('legacy');
     const player = SoundKit.createPlayer({ songs, effects, ignoreSilentSwitch: true });
     player.setup();
 
@@ -140,17 +141,11 @@
     const filters = createFilters();
     bgmPanel.appendChild(filters.element);
 
-    const groupElements = SONG_GROUPS.map(({ title, ids }) => {
-        const heading = document.createElement('h2');
-        heading.className = 'group';
-        heading.textContent = title;
-        // ジャンルの中の曲は、画面の幅に合わせて横にも並べる
-        const grid = document.createElement('div');
-        grid.className = 'song-grid';
-        bgmPanel.append(heading, grid);
-        ids.forEach(id => createCard(id, songs[id], grid));
-        return { heading, grid, ids };
-    });
+    // 曲は、画面の幅に合わせて横にも並べる
+    const songGrid = document.createElement('div');
+    songGrid.className = 'song-grid';
+    bgmPanel.appendChild(songGrid);
+    songIds.forEach(id => createCard(id, songs[id], songGrid));
     applyFilter();
 
     // 絞り込みの欄
@@ -196,15 +191,10 @@
 
     function applyFilter() {
         let shown = 0;
-        groupElements.forEach(({ heading, grid, ids }) => {
-            let visible = 0;
-            ids.forEach(id => {
-                const ok = matches(songs[id]);
-                cards.get(id).card.hidden = !ok;
-                if (ok) visible++;
-            });
-            heading.hidden = grid.hidden = visible === 0;
-            shown += visible;
+        songIds.forEach(id => {
+            const ok = matches(songs[id]);
+            cards.get(id).card.hidden = !ok;
+            if (ok) shown++;
         });
         const active = [...selected.values()].some(set => set.size > 0);
         filters.element.querySelector('.count').textContent = active ? `${Object.keys(songs).length}曲中 ${shown}曲` : `${Object.keys(songs).length}曲`;

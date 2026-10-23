@@ -111,21 +111,13 @@
     const cards = new Map();
 
     // ===== タグ =====
-    // 雰囲気は曲のデータの tags。テンポ・拍子・主旋律の楽器は、曲のデータから自動で決める
+    // 雰囲気は曲のデータの tags（6つから2つまで）。テンポは曲のテンポから自動で決める
 
-    const MOODS = ['明るい', '軽快', '楽しい', '落ち着いた', '静か', 'やさしい', 'のどか', 'おしゃれ', '優雅', '渋い', '冒険', '緊張感', '神秘的', '和風', '中華風', '中東風', '南国', 'ケルト'];
+    const MOODS = ['明るい', '軽快', '落ち着いた', 'おしゃれ', '神秘的', '緊張感'];
     const FACETS = [
         { name: '雰囲気', of: (song) => song.tags ?? [], order: MOODS },
-        { name: 'テンポ', of: (song) => [song.bpm < 90 ? 'ゆっくり' : song.bpm >= 126 ? '速い' : 'ふつう'], order: ['ゆっくり', 'ふつう', '速い'] },
-        { name: '拍子', of: (song) => [song.meter === '6/8' ? '8分の6拍子' : (song.stepsPerBar ?? 16) === 12 ? '3拍子' : '4拍子'], order: ['4拍子', '3拍子', '8分の6拍子'] },
-        { name: '主旋律', of: (song) => song.melody ? [instrumentName(song.parts[song.melody[0]])] : [], order: [] }
+        { name: 'テンポ', of: (song) => [song.bpm < 90 ? 'ゆっくり' : song.bpm >= 126 ? '速い' : 'ふつう'], order: ['ゆっくり', 'ふつう', '速い'] }
     ];
-
-    // 絞り込みでは、チップの矩形波の幅の違いはまとめて「チップ」にする
-    function instrumentName(part) {
-        if (part.instrument === 'chip' && part.wave !== 'triangle') return 'チップ';
-        return INSTRUMENTS.find(item => sameInstrument(item.preset, part))?.name ?? part.instrument;
-    }
 
     // 選んだタグ（種類ごと）。同じ種類の中は「どれか」、違う種類どうしは「すべて」に当てはまる曲を出す
     const selected = new Map(FACETS.map(facet => [facet.name, new Set()]));
@@ -161,17 +153,16 @@
     });
     applyFilter();
 
-    // 絞り込みの欄。スマホでは閉じておき、押すと開く
+    // 絞り込みの欄
     function createFilters() {
         const element = document.createElement('section');
         element.className = 'filters';
         element.innerHTML = `
-            <div class="filters-head">
-                <button class="filters-toggle" aria-expanded="false">絞り込み<span class="chevron"></span></button>
+            <div class="facets"></div>
+            <div class="filters-foot">
                 <span class="count"></span>
                 <button class="clear">解除</button>
-            </div>
-            <div class="facets"></div>`;
+            </div>`;
         const facetBox = element.querySelector('.facets');
         const chips = [];
         FACETS.forEach(facet => {
@@ -196,13 +187,6 @@
             });
             facetBox.appendChild(row);
         });
-        const toggle = element.querySelector('.filters-toggle');
-        const setOpen = (open) => {
-            element.classList.toggle('is-open', open);
-            toggle.setAttribute('aria-expanded', String(open));
-        };
-        setOpen(window.matchMedia('(min-width: 700px)').matches);
-        toggle.addEventListener('click', () => setOpen(!element.classList.contains('is-open')));
         element.querySelector('.clear').addEventListener('click', () => {
             selected.forEach(set => set.clear());
             applyFilter();
@@ -248,8 +232,8 @@
             <div class="now"><span class="where"></span><span class="time"></span></div>
             <label class="lead">主旋律<select></select></label>`;
         card.querySelector('h2').textContent = song.title;
-        // カードのタグ（雰囲気と、4拍子でない拍子）。押すと、そのタグで絞り込む
-        const cardTags = [...(song.tags ?? []).map(tag => ['雰囲気', tag]), ...FACETS[2].of(song).filter(tag => tag !== '4拍子').map(tag => ['拍子', tag])];
+        // カードのタグ（雰囲気）。押すと、そのタグで絞り込む
+        const cardTags = (song.tags ?? []).map(tag => ['雰囲気', tag]);
         cardTags.forEach(([facet, tag]) => {
             const chip = document.createElement('button');
             chip.className = 'tag';
@@ -329,8 +313,13 @@
         cards.forEach(({ card, segments, compiled, info }, id) => {
             const playing = position?.name === id;
             card.classList.toggle('is-playing', playing);
-            card.querySelector('.play').innerHTML = playing ? STOP_ICON : PLAY_ICON;
-            card.querySelector('.play').setAttribute('aria-label', playing ? '停止' : '再生');
+            // アイコンは、再生と停止が切り替わったときだけ替える（毎フレーム作り直すと、押している途中で差し替わって押せないことがある）
+            const button = card.querySelector('.play');
+            if (button.dataset.playing !== String(playing)) {
+                button.dataset.playing = String(playing);
+                button.innerHTML = playing ? STOP_ICON : PLAY_ICON;
+                button.setAttribute('aria-label', playing ? '停止' : '再生');
+            }
             segments.forEach(({ section, button }) => {
                 const inside = playing && position.step >= section.start && position.step < section.start + section.length;
                 button.classList.toggle('is-current', inside);

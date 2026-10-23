@@ -89,7 +89,7 @@ sections: {
 
 候補の曲は、1曲ずつ `games/<ゲーム名>.<曲名>.js` に書いて並行で作れる（`SoundKit.register('<ゲーム名>', { songs: { <曲名>: ... } })`。同じ名前の登録は足し合わされる）。`node tools/lint-songs.mjs <ファイル>` で、そのファイルだけを検査できる。
 
-曲の項目：`title`・`genre`（ジャンル。試聴ページの見出し）・`tags`（雰囲気のタグ。明るい・軽快・楽しい・落ち着いた・静か・やさしい・のどか・おしゃれ・優雅・渋い・冒険・緊張感・神秘的・和風・中華風・中東風・南国・ケルト から1〜3個。テンポ・拍子・主旋律の楽器のタグは試聴ページが自動で付ける）・`melody`（主旋律のパートの名前）・`meter`（8分の6拍子なら `'6/8'`）・`bpm`・`gain`・`swing`（裏拍を遅らせる割合、0〜0.2）・`swingUnit`（1：16分、2：8分）・`humanize`（`{ time: 秒, velocity: 割合 }`。わずかなばらつき）・`reverb`（`{ seconds, tone }`）・`delay`（`{ time: 拍, feedback, tone, reverb }`）・`intro`・`loop`。
+曲の項目：`title`・`genre`（ジャンル。試聴ページの見出し）・`tags`（雰囲気のタグ。明るい・軽快・落ち着いた・おしゃれ・神秘的・緊張感 から1〜2個。テンポのタグは試聴ページが自動で付ける）・`melody`（主旋律のパートの名前）・`meter`（8分の6拍子なら `'6/8'`）・`bpm`・`gain`・`swing`（裏拍を遅らせる割合、0〜0.2）・`swingUnit`（1：16分、2：8分）・`humanize`（`{ time: 秒, velocity: 割合 }`。わずかなばらつき）・`reverb`（`{ seconds, tone }`）・`delay`（`{ time: 拍, feedback, tone, reverb }`）・`intro`・`loop`。
 
 パートの項目：`instrument`・`mode`・`volume`・`pan`・`reverb`・`delay`（送りの量）・`cutoff`（ローパス）・`chorus`・`autopan`・`gate`（音の長さの割合）・`humanize: false`、ほかに楽器ごとの設定（`chip` の `wave`・`duty`・`vibrato`、`pluck` の `brightness` など。`src/sound-kit.js` の INSTRUMENTS）。
 

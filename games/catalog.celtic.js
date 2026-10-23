@@ -46,7 +46,7 @@
 
     const celtic = {
         title: '丘の上のジグ',
-        tags: ['軽快', 'のどか', 'ケルト'], meter: '6/8',
+        tags: ['軽快'], meter: '6/8',
         genre: 'ワールド',
         melody: ['lead'],
         bpm: 126,

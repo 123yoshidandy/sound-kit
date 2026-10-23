@@ -7,7 +7,7 @@
 
     const wafu = {
         title: 'ことのは庭',
-        tags: ['落ち着いた', '和風'],
+        tags: ['落ち着いた'],
         genre: 'ワールド',
         melody: ['lead'],
         bpm: 92,

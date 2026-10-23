@@ -32,7 +32,7 @@
 
     const minuet = {
         title: '庭園のメヌエット',
-        tags: ['優雅'],
+        tags: ['落ち着いた'],
         genre: 'クラシック',
         melody: ['lead'],   // 主旋律のパート（試聴ページで楽器を替えられる）
         bpm: 126,

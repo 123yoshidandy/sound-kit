@@ -708,16 +708,24 @@
         // はじく弦（Karplus-Strong）：雑音を、音の高さの周期で繰り返しながら丸めていく
         pluck(context, out, note, p) {
             const { time, frequency, velocity, duration, midi } = note;
-            const { buffer, baseFrequency } = pluckBuffer(context, midi, p.brightness ?? 0.5, p.sustain ?? 0.996);
+            const brightness = p.brightness ?? 0.5;
+            const { buffer, baseFrequency } = pluckBuffer(context, midi, brightness, p.sustain ?? 0.996);
             const source = context.createBufferSource();
             source.buffer = buffer;
             source.playbackRate.value = frequency / baseFrequency;
+            // 高い倍音が耳につかないように、音の高さに合わせたローパスで丸める
+            const filter = context.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = clamp(frequency * (2.5 + 5 * brightness), 500, 5000);
+            filter.Q.value = 0.5;
             const gain = context.createGain();
             const release = p.release ?? 0.12;
             const end = time + duration;
-            gain.gain.setValueAtTime(0.55 * velocity, time);
+            // はじいた瞬間の「カチッ」を消すため、少しだけかけて立ち上げる
+            gain.gain.setValueAtTime(0, time);
+            gain.gain.linearRampToValueAtTime(0.45 * velocity, time + 0.005);
             gain.gain.setTargetAtTime(0, end, release / 4.6);
-            source.connect(gain).connect(out);
+            source.connect(filter).connect(gain).connect(out);
             source.start(time);
             source.stop(Math.min(end + release * 1.5, time + buffer.duration / source.playbackRate.value));
         },
@@ -986,13 +994,16 @@
         const seconds = clamp(3 * (110 / frequency) ** 0.5, 0.5, 3);
         const buffer = context.createBuffer(1, Math.floor(rate * seconds), rate);
         const data = buffer.getChannelData(0);
-        // 最初の1周期は、ローパスを通した雑音（brightness が小さいほど柔らかい）
+        // 最初の1周期は、2段のローパスで丸めた雑音（brightness が小さいほど柔らかい）
+        const smoothing = 0.08 + 0.5 * brightness;
         let low = 0;
+        let lower = 0;
         let mean = 0;
         for (let i = 0; i < period; i++) {
-            low += brightness * ((Math.random() * 2 - 1) - low);
-            data[i] = low;
-            mean += low / period;
+            low += smoothing * ((Math.random() * 2 - 1) - low);
+            lower += smoothing * (low - lower);
+            data[i] = lower;
+            mean += lower / period;
         }
         let peak = 0;
         for (let i = 0; i < period; i++) {
@@ -1661,10 +1672,11 @@
             play,
             preload,
             // BGM を流す。fromStep で途中から（試聴ページで区間を選ぶとき）
-            playBgm(name, { fromStep = 0 } = {}) {
-                const restart = fromStep !== 0 || state.bgmName !== name;
+            // fromStep を渡したときは、同じ曲が流れていても、その位置から鳴らし直す（0 なら頭から）
+            playBgm(name, { fromStep } = {}) {
+                const restart = fromStep !== undefined || state.bgmName !== name;
                 state.bgmName = name;
-                state.bgmFromStep = fromStep;
+                state.bgmFromStep = fromStep ?? 0;
                 if (restart && state.playback) {
                     state.playback.stop(0.25);
                     state.playback = null;

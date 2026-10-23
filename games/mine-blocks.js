@@ -126,7 +126,7 @@
     // マリンバとベル：明るいパズルゲームらしく
     const hidamari = {
         title: 'ひだまりパズル',
-        tags: ['明るい', 'やさしい'],
+        tags: ['明るい'],
         genre: 'ゲーム音楽',
         melody: ['lead'],
         bpm: 110,

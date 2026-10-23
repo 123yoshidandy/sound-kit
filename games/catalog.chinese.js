@@ -35,7 +35,7 @@
 
     const chinese = {
         title: '桃の花の庭',
-        tags: ['のどか', '中華風'],
+        tags: ['落ち着いた'],
         genre: 'ワールド',
         melody: ['lead'],
         bpm: 96,

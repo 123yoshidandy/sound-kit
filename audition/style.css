@@ -415,32 +415,12 @@ main {
     margin-bottom: 4px;
 }
 
-.filters-head {
+.filters-foot {
     display: flex;
     align-items: center;
     gap: 12px;
-}
-
-.filters-toggle {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 0;
-    background: none;
-    font-weight: 800;
-}
-
-.filters-toggle .chevron {
-    width: 8px;
-    height: 8px;
-    border-right: 2px solid var(--muted);
-    border-bottom: 2px solid var(--muted);
-    transform: rotate(45deg) translateY(-2px);
-    transition: transform 0.15s;
-}
-
-.filters.is-open .filters-toggle .chevron {
-    transform: rotate(-135deg) translateY(-2px);
+    padding-top: 8px;
+    border-top: 1px solid var(--card-line);
 }
 
 .filters .count {
@@ -463,20 +443,10 @@ main {
     font-weight: 700;
 }
 
-.facets {
-    display: none;
-    margin-top: 8px;
-}
-
-.filters.is-open .facets {
-    display: block;
-}
-
 .facet {
     display: flex;
     gap: 10px;
     padding: 6px 0;
-    border-top: 1px solid var(--card-line);
 }
 
 .facet-name {
@@ -536,4 +506,9 @@ main {
 
 .tag.is-on {
     box-shadow: none;
+}
+
+/* アイコンではなく、ボタンそのものが押されたことを受け取る */
+.play svg {
+    pointer-events: none;
 }

@@ -24,7 +24,7 @@ function fakeContext() {
         counts,
         createOscillator: () => { counts.oscillators++; return source({ type: 'sine', frequency: param(), detune: param(), setPeriodicWave() {} }); },
         createGain: () => node({ gain: param() }),
-        createBiquadFilter: () => node({ type: 'lowpass', frequency: param(), Q: param() }),
+        createBiquadFilter: () => node({ type: 'lowpass', frequency: param(), Q: param(), gain: param() }),
         createBufferSource: () => { counts.sources++; return source({ buffer: null, loop: false, playbackRate: param() }); },
         createBuffer: (channels, length) => {
             const data = Array.from({ length: channels }, () => new Float32Array(length));

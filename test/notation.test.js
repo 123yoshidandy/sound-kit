@@ -88,6 +88,11 @@ describe('和音から音を作る', () => {
         expect(movement).toBeLessThanOrEqual(4);
     });
 
+    it('和音の刻みの音には、低い音から順に strum の番号が付く（かき鳴らすようにずらすため）', () => {
+        const events = compileSection({ instrument: 'guitar', mode: 'chords', voices: 4, strum: 0.012 }, 'x---------------', { chords: 'C' });
+        expect(events.map(e => e.strum)).toEqual([0, 1, 2, 3]);
+    });
+
     it('hold は、和音が変わるたびに、その長さだけ鳴らす', () => {
         const events = compileSection({ instrument: 'pad', mode: 'chords', voices: 4 }, 'hold', { chords: 'C:8 G:8 | F' });
         expect([...new Set(events.map(e => `${e.start}:${e.length}`))]).toEqual(['0:8', '8:8', '16:16']);

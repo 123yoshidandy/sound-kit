@@ -20,7 +20,12 @@
         { id: 'steelpan', group: 'たたく・はじく', name: 'スチールパン', note: '南国の金属の鍋', instrument: 'steelpan', lead: true },
         { id: 'epiano', group: '鍵盤', name: 'エレピ', note: 'FM・電気ピアノ', instrument: 'epiano', lead: true },
         { id: 'harp', group: 'たたく・はじく', trim: -3, name: 'ハープ', note: '明るくはじく弦', instrument: { instrument: 'pluck', brightness: 0.75, sustain: 0.997 }, lead: true },
+        { id: 'guitar', group: 'たたく・はじく', name: 'ギター', note: 'はじく弦に胴の響き', instrument: 'guitar', lead: true },
         { id: 'pluck', group: 'たたく・はじく', trim: -3, name: 'はじく弦', note: 'やわらかい弦', instrument: 'pluck', lead: true },
+        { id: 'strings', group: '伸ばす', name: 'ストリングス', note: '弦楽器のアンサンブル', instrument: 'strings', lead: true },
+        { id: 'brass', group: '伸ばす', name: 'ブラス', note: '吹いた瞬間に明るく開く', instrument: 'brass', lead: true },
+        { id: 'accordion', group: '伸ばす', name: 'アコーディオン', note: '2枚のリードの揺れ', instrument: 'accordion', lead: true },
+        { id: 'choir', group: '伸ばす', name: '合唱', note: '「あー」の響き', instrument: 'choir', notes: 'C5:4 E5 G5 E5:4 [C4,E4,G4]:16', lead: true },
         { id: 'flute', group: '伸ばす', name: 'フルート', note: '息の音・ビブラート', instrument: 'flute', lead: true },
         { id: 'whistle', group: '伸ばす', name: '口笛', note: '澄んだサイン波', instrument: { instrument: 'flute', breath: 0, vibrato: 18 }, lead: true },
         { id: 'ocarina', group: '伸ばす', name: 'オカリナ', note: '丸くこもった笛', instrument: 'ocarina', lead: true },
@@ -34,6 +39,8 @@
         { id: 'synthBass', group: '伴奏・ドラム', name: 'シンセベース', note: 'ローパス', instrument: 'synthBass', notes: 'C2:3 C2:1 r:2 C3:2 G2:3 G2:1 Bb2:2 C3:4' },
         { id: 'triangle', group: 'チップ', name: 'チップ 三角波', note: 'ベース向き', instrument: { instrument: 'chip', wave: 'triangle', level: 0.4, sustain: 0.85 }, notes: 'C3:2 C4 C3 C4 G2:2 G3 G2 G3 C3:8' },
         { id: 'drums', group: '伴奏・ドラム', name: 'ドラム', note: 'やわらかい組', instrument: { instrument: 'drums', kit: 'soft' }, notes: 'kick:2 hat snare hat kick kick snare openHat kick:2 shaker rim shaker kick clap tom tom', unit: 0.13 },
+        { id: 'brushDrums', group: '伴奏・ドラム', name: 'ドラム（ブラシ）', note: 'こするスネア・ジャズ向き', instrument: { instrument: 'drums', kit: 'brush' }, notes: 'kick:2 swish:4 hat:2 kick:2 swish:2 snare:2 hat:2 ride:2 ride ride ride:4', unit: 0.13 },
+        { id: 'acousticDrums', group: '伴奏・ドラム', name: 'ドラム（生ドラム風）', note: 'シンバル付き', instrument: { instrument: 'drums', kit: 'acoustic' }, notes: 'crash:2 hat snare hat kick kick snare hat kick:2 tom tom snare:2 crash:4', unit: 0.13 },
         { id: 'chipDrums', group: 'チップ', name: 'ドラム（チップ）', note: '雑音と三角波', instrument: { instrument: 'drums', kit: 'chip' }, notes: 'kick:2 hat snare hat kick kick snare openHat', unit: 0.12 }
     ];
 

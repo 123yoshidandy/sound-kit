@@ -91,9 +91,9 @@ const song = {
 楽器は次のとおりです。試聴ページの「楽器」で鳴らせます。
 
 - 鍵盤：`piano`・`epiano`・`organ`
-- たたく・はじく：`marimba`・`xylophone`・`vibes`・`bell`・`musicBox`（オルゴール）・`kalimba`・`steelpan`・`pluck`（`brightness` を上げるとハープ）
-- 伸ばす：`flute`（`breath: 0` で口笛）・`ocarina`・`clarinet`・`softLead`・`pad`
-- そのほか：`synthBass`・`chip`（矩形波・三角波）・`drums`（組は `soft`・`chip`・`legacy`）
+- たたく・はじく：`marimba`・`xylophone`・`vibes`・`bell`・`musicBox`（オルゴール）・`kalimba`・`steelpan`・`pluck`（`brightness` を上げるとハープ）・`guitar`（胴の響き付き。和音の刻みのパートに `strum: 0.012` などと書くと、かき鳴らすようにずらす）
+- 伸ばす：`strings`（弦楽器のアンサンブル）・`brass`・`accordion`・`choir`（合唱）・`flute`（`breath: 0` で口笛）・`ocarina`・`clarinet`・`softLead`・`pad`
+- そのほか：`synthBass`・`chip`（矩形波・三角波）・`drums`（組は `soft`・`brush`（ジャズ向き。こするスネアは `swish`）・`acoustic`（生ドラム風）・`chip`・`legacy`。`ride`・`crash` のシンバルは soft・brush・acoustic で使える）
 
 ## 同期
 

@@ -25,7 +25,9 @@
 |---|---|---|---|
 | メロディ | いちばん目立つ。歌えるくらいの動き | A4〜D6（チップは C5〜F6） | 既定は piano。ほかに marimba・chip・softLead など |
 | 対旋律・ベル | メロディが伸ばしている所や休みに、短く答える | C5〜F#6 | bell・chip（duty 0.5） |
-| 伴奏 | 和音を刻む・分散する | C4〜E5（メロディより下） | marimba（arp）・epiano（chords）・pluck（arp） |
+| 伴奏 | 和音を刻む・分散する | C4〜E5（メロディより下） | marimba（arp）・epiano（chords）・pluck（arp）・guitar（chords と strum でかき鳴らす） |
+| 厚み | 和音を伸ばして支える。盛り上げる区間で足す | C3〜C5 | strings・choir・pad・organ |
+| 合いの手・盛り上げ | 区間の頭や終わりで短く鳴らす | C4〜C6 | brass・bell・accordion |
 | パッド | 和音を薄く敷く。B・C で足す | A3〜D5 | pad |
 | ベース | 和音の根音。スマホではほぼ聞こえないので、メロディに頼る | C2〜C4（octave 2） | pluck・synthBass・chip（三角波） |
 | ドラム | 拍を示す。うるさくしない | — | drums（soft・chip） |

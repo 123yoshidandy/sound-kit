@@ -322,7 +322,8 @@
             const previous = info.voicingState[info.partName];
             const voicing = voiceChord(chord, center, voices, previous, settings.bass ?? false);
             info.voicingState[info.partName] = voicing;
-            return voicing.map(midi => ({ start: hit.start, length: hit.length, velocity: hit.velocity, midi, glide: null }));
+            // strum：低い音から順に、何番目の音か（パートの strum の秒数だけずらして鳴らす）
+            return voicing.map((midi, strum) => ({ start: hit.start, length: hit.length, velocity: hit.velocity, midi, glide: null, strum }));
         });
     }
 
@@ -908,7 +909,109 @@
             });
         },
 
-        // ドラム：kit で音色の組を選ぶ（'soft'・'chip'・'legacy'）。levels でドラムごとの音量を変えられる
+        // 弦楽器（ストリングス）：少しずつずらした3本ののこぎり波を、ゆっくり立ち上げてビブラートをかける。ローパスで弓の音のやわらかさを出す
+        strings(context, out, note, p) {
+            const { time, frequency, velocity, duration } = note;
+            const filter = context.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = clamp(frequency * 6, 1200, 5000) * (p.brightness ?? 1);
+            filter.Q.value = 0.7;
+            const amp = context.createGain();
+            const stop = envelope(amp.gain, time, duration, { attack: p.attack ?? 0.18, decay: 0.6, sustain: 0.85, release: p.release ?? 0.35 }, 0.09 * velocity);
+            const oscs = [-9, 0, 9].map(detune => {
+                const osc = oscillator(context, 'sawtooth', frequency, time);
+                osc.detune.value = detune;
+                applyGlide(osc, note);
+                osc.connect(filter);
+                osc.start(time);
+                osc.stop(stop + 0.02);
+                return osc;
+            });
+            addVibrato(context, oscs, time, stop, { depth: p.vibrato ?? 9, rate: 5.2, delay: 0.25 });
+            filter.connect(amp).connect(out);
+        },
+
+        // ブラス：吹いた瞬間に明るさが開くのこぎり波と矩形波。少し下からしゃくり上げる
+        brass(context, out, note, p) {
+            const { time, frequency, velocity, duration } = note;
+            const filter = context.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.Q.value = 1;
+            const open = frequency * (p.brightness ?? 5) * (0.6 + 0.4 * velocity);
+            filter.frequency.setValueAtTime(frequency * 1.5, time);
+            filter.frequency.linearRampToValueAtTime(Math.min(open, 9000), time + 0.06);
+            filter.frequency.setTargetAtTime(Math.min(frequency * 3.5, 7000), time + 0.06, 0.3);
+            const amp = context.createGain();
+            const stop = envelope(amp.gain, time, duration, { attack: p.attack ?? 0.035, decay: 0.5, sustain: 0.8, release: p.release ?? 0.12 }, 0.14 * velocity);
+            const oscs = [['sawtooth', -4, 1], ['square', 4, 0.4]].map(([type, detune, level]) => {
+                const osc = oscillator(context, type, frequency, time);
+                osc.detune.setValueAtTime(detune - 35, time);
+                osc.detune.linearRampToValueAtTime(detune, time + 0.06);
+                applyGlide(osc, note);
+                const gain = context.createGain();
+                gain.gain.value = level;
+                osc.connect(gain).connect(filter);
+                osc.start(time);
+                osc.stop(stop + 0.02);
+                return osc;
+            });
+            addVibrato(context, oscs, time, stop, { depth: p.vibrato ?? 8, rate: 5.5, delay: 0.3 });
+            filter.connect(amp).connect(out);
+        },
+
+        // アコーディオン：少しずらした2枚のリード（ミュゼット）を重ねる
+        accordion(context, out, note, p) {
+            wind(context, out, note, {
+                partials: [[1, 0.6, 'sawtooth'], [1.007, 0.6, 'sawtooth'], [2, 0.12, 'square']], peak: 0.14, attack: p.attack ?? 0.03,
+                sustain: 0.9, cutoff: p.cutoff ?? 3000, vibrato: 0, breathLevel: 0.008, release: p.release ?? 0.08
+            });
+        },
+
+        // 合唱：のこぎり波を、母音「あー」の響き（フォルマント）を作る3つの帯域フィルターに通す
+        choir(context, out, note, p) {
+            const { time, frequency, velocity, duration } = note;
+            const amp = context.createGain();
+            const stop = envelope(amp.gain, time, duration, { attack: p.attack ?? 0.25, decay: 0.8, sustain: 0.9, release: p.release ?? 0.5 }, 0.5 * velocity);
+            const mix = context.createGain();
+            [[750, 1, 6], [1150, 0.6, 8], [2600, 0.25, 10]].forEach(([center, level, q]) => {
+                const band = context.createBiquadFilter();
+                band.type = 'bandpass';
+                band.frequency.value = center;
+                band.Q.value = q;
+                const gain = context.createGain();
+                gain.gain.value = level;
+                mix.connect(band).connect(gain).connect(amp);
+            });
+            const oscs = [-6, 6].map(detune => {
+                const osc = oscillator(context, 'sawtooth', frequency, time);
+                osc.detune.value = detune;
+                applyGlide(osc, note);
+                osc.connect(mix);
+                osc.start(time);
+                osc.stop(stop + 0.02);
+                return osc;
+            });
+            addVibrato(context, oscs, time, stop, { depth: p.vibrato ?? 12, rate: 5, delay: 0.2 });
+            amp.connect(out);
+        },
+
+        // ギター：はじく弦に、胴の響き（低い山と高い山）を足す。和音の刻みのパートに strum（秒）を書くと、かき鳴らすようにずらす
+        guitar(context, out, note, p) {
+            const low = context.createBiquadFilter();
+            low.type = 'peaking';
+            low.frequency.value = 220;
+            low.gain.value = 4;
+            low.Q.value = 1;
+            const high = context.createBiquadFilter();
+            high.type = 'peaking';
+            high.frequency.value = 2500;
+            high.gain.value = 3;
+            high.Q.value = 1.2;
+            low.connect(high).connect(out);
+            INSTRUMENTS.pluck(context, low, note, { brightness: p.brightness ?? 0.55, sustain: p.sustain ?? 0.995, release: p.release ?? 0.15 });
+        },
+
+        // ドラム：kit で音色の組を選ぶ（'soft'・'brush'・'acoustic'・'chip'・'legacy'）。levels でドラムごとの音量を変えられる
         drums(context, out, note, p) {
             const kit = DRUM_KITS[p.kit ?? 'soft'];
             const play = kit[note.drum];
@@ -955,6 +1058,61 @@
             snare: (c, o, t, v) => legacyNoise(c, o, { start: t, duration: 0.12, volume: 0.35 * v, filter: 'bandpass', frequency: 1800 }),
             hat: (c, o, t, v) => legacyNoise(c, o, { start: t, duration: 0.03, volume: 0.15 * v })
         }
+    };
+
+    // 金属的な響き：整数比でない6つの矩形波を重ね、高い所だけを残す（シンバル・ハイハット）
+    function metal(context, out, time, { duration, peak, highpass = 7000, pitch = 1 }) {
+        const filter = context.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = highpass;
+        const gain = context.createGain();
+        gain.gain.setValueAtTime(0, time);
+        gain.gain.linearRampToValueAtTime(peak, time + 0.002);
+        gain.gain.setTargetAtTime(0, time + 0.002, duration / 4.6);
+        filter.connect(gain).connect(out);
+        [205.3, 304.4, 369.6, 522.7, 540, 800].forEach(f => {
+            const osc = oscillator(context, 'square', f * pitch, time);
+            const level = context.createGain();
+            level.gain.value = 1 / 6;
+            osc.connect(level).connect(filter);
+            osc.start(time);
+            osc.stop(time + duration * 1.5 + 0.02);
+        });
+    }
+
+    // シンバル（どの組でも使えるように、soft に足しておく）
+    DRUM_KITS.soft.ride = (c, o, t, v) => {
+        metal(c, o, t, { duration: 0.8, peak: 0.05 * v, highpass: 6000, pitch: 1.6 });
+        noiseBurst(c, o, t, { duration: 0.5, peak: 0.03 * v, type: 'highpass', frequency: 8000 });
+    };
+    DRUM_KITS.soft.crash = (c, o, t, v) => {
+        noiseBurst(c, o, t, { duration: 1.4, peak: 0.12 * v, type: 'highpass', frequency: 4500 });
+        metal(c, o, t, { duration: 1.2, peak: 0.04 * v, highpass: 5000, pitch: 2.1 });
+    };
+
+    // ブラシ：こするスネア（swish）と、たたくスネア（tap）。ジャズ向き
+    DRUM_KITS.brush = {
+        ...DRUM_KITS.soft,
+        kick: (c, o, t, v) => sweepTone(c, o, t, { from: 100, to: 50, sweep: 0.06, duration: 0.3, peak: 0.6 * v }),
+        snare: (c, o, t, v) => noiseBurst(c, o, t, { duration: 0.08, peak: 0.22 * v, type: 'bandpass', frequency: 2200, q: 0.8 }),
+        swish: (c, o, t, v) => noiseBurst(c, o, t, { duration: 0.24, peak: 0.12 * v, type: 'bandpass', frequency: 3200, q: 0.6, attack: 0.03 }),
+        hat: (c, o, t, v) => noiseBurst(c, o, t, { duration: 0.03, peak: 0.1 * v, type: 'highpass', frequency: 9000 })
+    };
+
+    // 生ドラム風：踏んだ瞬間の音があるキック、響き線の鳴るスネア、金属的なハイハット
+    DRUM_KITS.acoustic = {
+        ...DRUM_KITS.soft,
+        kick: (c, o, t, v) => {
+            sweepTone(c, o, t, { from: 110, to: 45, sweep: 0.06, duration: 0.45, peak: 0.95 * v });
+            noiseBurst(c, o, t, { duration: 0.008, peak: 0.25 * v, type: 'lowpass', frequency: 5000 });
+        },
+        snare: (c, o, t, v) => {
+            sweepTone(c, o, t, { type: 'triangle', from: 200, to: 170, sweep: 0.03, duration: 0.12, peak: 0.35 * v });
+            noiseBurst(c, o, t, { duration: 0.2, peak: 0.45 * v, type: 'highpass', frequency: 1500 });
+        },
+        hat: (c, o, t, v) => metal(c, o, t, { duration: 0.05, peak: 0.12 * v, highpass: 8000 }),
+        openHat: (c, o, t, v) => metal(c, o, t, { duration: 0.35, peak: 0.09 * v, highpass: 7500 }),
+        tom: (c, o, t, v) => sweepTone(c, o, t, { from: 160, to: 120, sweep: 0.1, duration: 0.4, peak: 0.6 * v })
     };
 
     function legacyTone(context, out, { type, from, to, start, duration, volume }) {
@@ -1251,7 +1409,7 @@
                     continue;
                 }
                 const event = events[this.index];
-                const time = this.timeOf(event.start) + event.offset;
+                const time = this.timeOf(event.start) + event.offset + (event.strum ?? 0) * (this.song.parts[event.part].strum ?? 0);
                 if (time >= until) return;
                 const audible = !this.parts || this.parts.includes(event.part);
                 if (audible && time >= this.context.currentTime - 0.02) this.playEvent(event, Math.max(time, this.context.currentTime), stepSeconds);

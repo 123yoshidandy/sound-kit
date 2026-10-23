@@ -123,7 +123,7 @@
         loop: ['A', 'A2', 'B', 'C', 'A3', 'A4']
     };
 
-    // マリンバとベル：明るいパズルゲームらしく
+    // マリンバとベル：明るいパズルゲームらしく。2回目の A からギターの裏拍と弦楽器、区間の頭でブラスを足す
     const hidamari = {
         title: 'ひだまりパズル',
         tags: ['明るい'],
@@ -131,17 +131,23 @@
         melody: ['lead'],
         bpm: 110,
         swing: 0.08,
-        gain: 0.06,
+        gain: 0.069,
         reverb: { seconds: 2.2, tone: 0.5 },
         delay: { time: 0.75, feedback: 0.25, tone: 3000 },
         humanize: { time: 0.006, velocity: 0.08 },
         parts: {
-            lead: { instrument: 'marimba', volume: 1, pan: -0.15, reverb: 0.22 },
+            lead: { instrument: 'marimba', volume: 0.85, pan: -0.15, reverb: 0.22 },
             comp: { instrument: 'marimba', mode: 'arp', from: 'C4', volume: 0.45, pan: 0.25, reverb: 0.2, decay: 0.8, brightness: 0.7 },
             bell: { instrument: 'bell', volume: 0.45, pan: 0.15, reverb: 0.35, delay: 0.15 },
             bass: { instrument: 'pluck', mode: 'bass', octave: 2, brightness: 0.35, sustain: 0.995, release: 0.1, volume: 0.95, gate: 0.9 },
             pad: { instrument: 'pad', mode: 'chords', center: 'F4', voices: 4, volume: 0.45, cutoff: 1100, reverb: 0.4 },
-            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.75, levels: { kick: 0.8, rim: 0.6, shaker: 0.7 } }
+            // 弦楽器：B でパッドに替えて敷き、最後の A' で低く支える
+            strings: { instrument: 'strings', mode: 'chords', center: 'F4', voices: 4, volume: 0.42, pan: -0.2, attack: 0.35, release: 0.5, brightness: 0.8, reverb: 0.4 },
+            // ギター：裏拍で軽くかき鳴らす（短く切る）
+            guitar: { instrument: 'guitar', mode: 'chords', center: 'E4', voices: 3, strum: 0.01, brightness: 0.4, gate: 0.5, volume: 0.32, pan: 0.3, reverb: 0.2 },
+            // ブラス：区間の頭の短い合いの手
+            brass: { instrument: 'brass', mode: 'chords', center: 'A4', voices: 3, volume: 0.38, pan: -0.1, brightness: 3, reverb: 0.3, delay: 0.1 },
+            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.75, levels: { kick: 0.8, rim: 0.6, shaker: 0.7, tom: 0.5, crash: 0.3 } }
         },
         sections: {
             intro: {
@@ -186,9 +192,12 @@
                 bell: `D6:6 C6:2 A5:8 | G5:6 A5:2 C6:8 | E6:6 D6:2 C6:8 | A5:12 r:4 |
                        Bb5:6 A5:2 G5:8 | G5:6 Bb5:2 C6:8 | A5:6 C6:2 E6:8 | F#6:8 D6:4 C6:4`,
                 comp: '0:2 1 2 3 4 3 2 1',
-                pad: 'hold',
+                strings: 'hold',
+                guitar: '..x-..x-..x-..x-',
+                brass: 'x-----..........|' + repeat('................', 3, '|') + '|x-----..........|' + repeat('................', 3, '|'),
                 bass: 'R:6 R:2 5:6 R:2',
                 drums: {
+                    crash: 'x...............|' + repeat('................', 7, '|'),
                     kick: repeat('x.......x.......', 8, '|'),
                     rim: repeat('....x.......x...', 8, '|'),
                     shaker: repeat('oxoxoxoxoxoxoxox', 8, '|')
@@ -204,7 +213,11 @@
                 comp: '0:4 1 2 1',
                 pad: 'hold',
                 bass: 'R:8 5:8',
-                drums: { shaker: repeat('o.o.o.o.o.o.o.o.', 8, '|') }
+                drums: {
+                    shaker: repeat('o.o.o.o.o.o.o.o.', 8, '|'),
+                    // 終わりにタムを軽く入れて、A へ戻る
+                    tom: repeat('................', 7, '|') + '|..........o.o.x.'
+                }
             },
             A3: {
                 label: 'A',
@@ -215,19 +228,47 @@
                        Bb5:3 A5:1 G5:2 F5:2 G5:2 Bb5:2 D6:2 C6:2 | C6:4 Bb5:2 G5:2 E5:4 r:2 C5:2`,
                 bell: 'C6:8 A5:8 | G5:8 C6:8 | A5:8 F5:8 | E5:8 C5:8 | D5:8 F5:8 | A5:8 C6:8 | Bb5:8 D6:8 | C6:8 Bb5:8',
                 comp: '0:2 1 2 1 3 1 2 1',
+                guitar: '..x-..x-..x-..x-',
+                brass: 'x-----..........|' + repeat('................', 7, '|'),
+                bass: 'R:4 r:2 R:2 5:2 r:2 R+:2 5:2',
+                drums: {
+                    crash: 'x...............|' + repeat('................', 7, '|'),
+                    kick: repeat('x.....x...x.....', 8, '|'),
+                    rim: repeat('....x.......x...', 8, '|'),
+                    shaker: repeat('oxoxoxoxoxoxoxox', 8, '|')
+                }
+            },
+            // 最後の A'：ギターの裏拍と、低い弦を足す。終わりにリムのフィルで頭へ戻る
+            A4: {
+                label: "A'",
+                chords: 'F | C/E | Dm7 | Am7 | Bbmaj7 | C | F | F',
+                lead: `A4:2 C5:2 F5:3 E5:1 F5:2 A5:2 r:2 G5:2 | E5:2 G5:2 C5:4 r:2 C5:2 D5:2 E5:2 |
+                       F5:2 A5:2 D6:3 C6:1 A5:2 F5:2 r:2 E5:2 | E5:2 C5:2 A4:4 r:4 G4:2 A4:2 |
+                       Bb4:2 D5:2 F5:3 E5:1 F5:2 A5:2 r:2 D5:2 | E5:2 G5:2 C6:3 Bb5:1 A5:2 G5:2 r:2 E5:2 |
+                       F5:4 r:2 C5:2 F5:2 A5:2 C6:4 | A5:2 G5:2 F5:4 r:8`,
+                comp: '0:2 1 2 1 3 1 2 1',
+                guitar: '..x-..x-..x-..x-',
+                strings: { pattern: 'hold', center: 'C4' },
                 bass: 'R:4 r:2 R:2 5:2 r:2 R+:2 5:2',
                 drums: {
                     kick: repeat('x.....x...x.....', 8, '|'),
-                    rim: repeat('....x.......x...', 8, '|'),
+                    rim: repeat('....x.......x...', 7, '|') + '|....x.....o.o.x.',
                     shaker: repeat('oxoxoxoxoxoxoxox', 8, '|')
                 }
             }
         },
         intro: ['intro'],
-        loop: ['A', 'A2', 'B', 'C', 'A3', 'A2']
+        loop: ['A', 'A2', 'B', 'C', 'A3', 'A4']
     };
 
-    // エレピとピアノ：落ち着いた、大人っぽい雰囲気で
+    // エレピとピアノ：落ち着いた、大人っぽい雰囲気で。ブラシとライドのドラムに、弦・ビブラフォン・柔らかいホルンを足す
+    const YOFUKE_RIDE = 'x...x.x.x...x.x.';
+    const YOFUKE_DRUMS = {
+        kick: repeat('x......x..x.....', 8, '|'),
+        swish: repeat('....x.......x...', 8, '|'),
+        ride: repeat(YOFUKE_RIDE, 8, '|')
+    };
+    const YOFUKE_CRASH = 'x...............|' + repeat('................', 7, '|');
     const yofuke = {
         title: '夜更けのロジック',
         tags: ['落ち着いた', 'おしゃれ'],
@@ -245,8 +286,15 @@
             lead: { instrument: 'piano', volume: 0.46, pan: -0.12, cutoff: 2600, reverb: 0.3, delay: 0.22 },
             pluck: { instrument: 'pluck', volume: 0.5, pan: 0.3, brightness: 0.45, reverb: 0.3, delay: 0.3 },
             pad: { instrument: 'pad', mode: 'chords', center: 'A3', voices: 3, volume: 0.22, cutoff: 900, reverb: 0.5 },
+            // 弦楽器：B でパッドに替え、最後の A に薄く敷く
+            strings: { instrument: 'strings', mode: 'chords', center: 'A3', voices: 4, volume: 0.28, pan: -0.25, attack: 0.5, release: 0.7, brightness: 0.7, vibrato: 7, reverb: 0.5 },
+            // ビブラフォン：A' で、メロディが伸ばしている所に答える
+            vibes: { instrument: 'vibes', volume: 0.4, pan: 0.35, reverb: 0.4, delay: 0.2 },
+            // 柔らかいホルン：最後の A で、和音を弱く伸ばす
+            horn: { instrument: 'brass', mode: 'chords', center: 'D4', voices: 4, volume: 0.3, pan: 0.15, brightness: 2, attack: 0.1, release: 0.4, vibrato: 4, reverb: 0.45 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, cutoff: 300, envelope: 1.5, volume: 0.45, gate: 0.95 },
-            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.39, cutoff: 5000, levels: { hat: 0.6, rim: 0.8 } }
+            // ブラシ：こするスネアと、ライドの刻み
+            drums: { instrument: 'drums', kit: 'brush', mode: 'drums', volume: 0.5, cutoff: 5000, levels: { hat: 0.6, rim: 0.8, swish: 0.9, snare: 0.7, ride: 0.8, crash: 0.25 } }
         },
         sections: {
             intro: {
@@ -261,23 +309,19 @@
                        r:2 A4:2 C#5:2 E5:4 F#5:2 A5:4 | F#5:6 E5:2 D5:8 | r:2 E5:2 F#5:2 B5:4 A5:2 F#5:4 | D5:12 r:4`,
                 keys: 'x-----x---x-----',
                 bass: 'R:6 R:4 5:2 r:2 R:2',
-                drums: {
-                    kick: repeat('x......x..x.....', 8, '|'),
-                    snare: repeat('....x.......x...', 8, '|'),
-                    hat: repeat('x.x.x.x.x.x.x.xo', 8, '|')
-                }
+                drums: { ...YOFUKE_DRUMS, crash: YOFUKE_CRASH }
             },
             B: {
                 chords: 'Bm7 | Gmaj7 | Em7 | F#7 | Bm7 | Gmaj7 | Em7 | A7sus4:8 A7:8',
                 lead: `r:2 F#5:2 A5:2 B5:4 A5:2 F#5:4 | A5:6 F#5:2 D5:8 | r:2 E5:2 G5:2 B5:4 A5:2 G5:4 | F#5:6 E5:2 C#5:4 A#4:4 |
                        B4:2 D5:2 F#5:2 A5:6 F#5:4 | B5:6 A5:2 F#5:8 | G5:4 F#5:2 E5:2 D5:4 B4:4 | D5:8 C#5:4 E5:4`,
                 keys: 'x-----x---x-----',
-                pad: 'hold',
+                strings: 'hold',
                 bass: 'R:6 R:4 5:2 r:2 R:2',
                 drums: {
-                    kick: repeat('x......x..x.....', 8, '|'),
-                    snare: repeat('....x.......x...', 8, '|'),
-                    hat: repeat('x.x.x.x.x.x.x.xo', 7, '|') + '|x.x.x.x.x.x.x...',
+                    ...YOFUKE_DRUMS,
+                    crash: YOFUKE_CRASH,
+                    ride: repeat(YOFUKE_RIDE, 7, '|') + '|x...x.x.x.......',
                     openHat: repeat('................', 7, '|') + '|..............x.'
                 }
             },
@@ -286,14 +330,11 @@
                 chords: 'Gmaj7 | F#m7 | Em7 | A7sus4:8 A7:8 | Dmaj7 | Bm7 | Em9 | A7sus4',
                 lead: `r:2 B4:2 D5:2 F#5:4 E5:2 D5:4 | E5:6 C#5:2 A4:8 | r:2 G4:2 B4:2 D5:4 E5:2 F#5:4 | E5:6 D5:2 C#5:8 |
                        r:2 A4:2 C#5:2 E5:4 F#5:2 A5:4 | F#5:6 E5:2 D5:8 | r:2 B5:2 A5:2 F#5:4 E5:2 D5:4 | E5:4 D5:4 A4:8`,
+                vibes: 'r:16 | r:8 E5:2 F#5:2 A5:4 | r:16 | r:8 G5:2 E5:2 C#6:4 | r:16 | r:8 F#5:2 A5:2 D6:4 | r:16 | r:8 G5:2 E5:2 D6:4',
                 keys: 'x-----x---x-----',
                 pad: 'hold',
                 bass: 'R:6 R:4 5:2 r:2 R:2',
-                drums: {
-                    kick: repeat('x......x..x.....', 8, '|'),
-                    snare: repeat('....x.......x...', 8, '|'),
-                    hat: repeat('x.x.x.x.x.x.x.xo', 8, '|')
-                }
+                drums: YOFUKE_DRUMS
             },
             C: {
                 chords: 'Gmaj7 | Gm6 | F#m7 | B7 | Em9 | A7sus4 | Dmaj7 | A7sus4:8 A7:8',
@@ -302,7 +343,7 @@
                 keys: 'x-------x-------',
                 pad: 'hold',
                 bass: 'R:12 5:4',
-                drums: { hat: repeat('o.o.o.o.o.o.o.o.', 8, '|') }
+                drums: { ride: repeat('o...o...o...o...', 8, '|') }
             },
             A3: {
                 label: 'A',
@@ -310,13 +351,11 @@
                 lead: `r:2 B4:2 D5:2 F#5:4 E5:2 D5:4 | E5:6 C#5:2 A4:8 | r:2 G4:2 B4:2 D5:4 E5:2 F#5:4 | E5:6 D5:2 C#5:8 |
                        r:2 A4:2 C#5:2 E5:4 F#5:2 A5:4 | F#5:6 E5:2 D5:8 | r:2 E5:2 F#5:2 B5:4 A5:2 F#5:4 | D5:12 r:4`,
                 keys: 'x-----x---x-----',
-                pad: 'hold',
+                strings: 'hold',
+                horn: 'o-------o-------',
                 bass: 'R:6 R:4 5:2 r:2 R:2',
-                drums: {
-                    kick: repeat('x......x..x.....', 8, '|'),
-                    snare: repeat('....x.......x...', 8, '|'),
-                    hat: repeat('x.x.x.x.x.x.x.xo', 8, '|')
-                }
+                // 終わりにブラシのフィルで頭へ戻る
+                drums: { ...YOFUKE_DRUMS, snare: repeat('................', 7, '|') + '|..........o.o.x.' }
             }
         },
         intro: ['intro'],

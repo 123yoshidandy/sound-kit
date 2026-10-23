@@ -11,10 +11,10 @@
     const KICK = 'x.......x.....x.';
     const SHAKER = 'x.o.x.o.x.o.x.o.';
 
-    // ボサノバ：ナイロン弦のギターとフルートで、おしゃれに落ち着いて
+    // ボサノバ：ナイロン弦のギターとピアノで、おしゃれに落ち着いて
     const bossa = {
         title: '午後のカフェテラス',
-        description: 'ギターとフルート・おしゃれで落ち着いた',
+        description: 'ギターとピアノ・おしゃれで落ち着いた',
         genre: 'ラテン',
         melody: ['lead'],
         bpm: 126,
@@ -23,7 +23,7 @@
         delay: { time: 0.75, feedback: 0.28, tone: 2400, reverb: 0.25 },
         humanize: { time: 0.006, velocity: 0.1 },
         parts: {
-            lead: { instrument: 'flute', volume: 0.76, pan: -0.12, reverb: 0.28, delay: 0.18 },
+            lead: { instrument: 'piano', volume: 0.65, pan: -0.12, reverb: 0.28, delay: 0.18 },
             vibes: { instrument: 'vibes', volume: 0.45, pan: 0.3, reverb: 0.35, delay: 0.15 },
             guitar: { instrument: 'pluck', mode: 'chords', center: 'F4', voices: 3, brightness: 0.3, sustain: 0.995, release: 0.15, volume: 0.64, pan: 0.2, reverb: 0.25 },
             pad: { instrument: 'pad', mode: 'chords', center: 'A3', voices: 3, volume: 0.36, cutoff: 900, reverb: 0.45 },
@@ -77,7 +77,7 @@
                     shaker: repeat(SHAKER, 8, '|')
                 }
             },
-            // 休憩：フルートとドラムを抜き、ビブラフォンが短く歌う
+            // 休憩：メロディとドラムを抜き、ビブラフォンが短く歌う
             C: {
                 chords: 'Bbmaj7 | Am7 | Gm9 | Fmaj7 | Ebmaj7 | Dm9 | Gm9 | C7sus4:8 C9:8',
                 vibes: `r:4 F5:2 A5:2 D6:8 | r:4 E5:2 G5:2 C6:8 | r:4 D5:2 F5:2 A5:8 | r:4 C5:2 E5:2 A5:8 |

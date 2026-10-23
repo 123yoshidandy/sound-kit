@@ -227,10 +227,10 @@
         loop: ['A', 'A2', 'B', 'C', 'A3', 'A2']
     };
 
-    // エレピとシンセ：落ち着いた、大人っぽい雰囲気で
+    // エレピとピアノ：落ち着いた、大人っぽい雰囲気で
     const yofuke = {
         title: '夜更けのロジック',
-        description: 'エレピとシンセ・落ち着いた',
+        description: 'エレピとピアノ・落ち着いた',
         genre: 'ジャズ・ブルース',
         melody: ['lead'],
         bpm: 84,
@@ -242,7 +242,7 @@
         humanize: { time: 0.008, velocity: 0.1 },
         parts: {
             keys: { instrument: 'epiano', mode: 'chords', center: 'E4', voices: 4, volume: 0.35, chorus: { depth: 0.002, rate: 0.6, mix: 0.45 }, autopan: { rate: 0.2, depth: 0.25 }, reverb: 0.3 },
-            lead: { instrument: 'softLead', volume: 0.75, pan: -0.12, cutoff: 2600, vibrato: 10, reverb: 0.3, delay: 0.22 },
+            lead: { instrument: 'piano', volume: 0.46, pan: -0.12, cutoff: 2600, reverb: 0.3, delay: 0.22 },
             pluck: { instrument: 'pluck', volume: 0.5, pan: 0.3, brightness: 0.45, reverb: 0.3, delay: 0.3 },
             pad: { instrument: 'pad', mode: 'chords', center: 'A3', voices: 3, volume: 0.22, cutoff: 900, reverb: 0.5 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, cutoff: 300, envelope: 1.5, volume: 0.45, gate: 0.95 },

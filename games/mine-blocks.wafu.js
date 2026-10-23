@@ -1,13 +1,13 @@
 /**
  * mine-blocks の BGM の候補：ことのは庭（和風）
- * ニ長調のヨナ抜き音階（D E F# A B）。B は ロ短調寄りの民謡音階で、C は笛を休ませて琴だけで歌う
+ * ニ長調のヨナ抜き音階（D E F# A B）。B は ロ短調寄りの民謡音階で、C はメロディを休ませて琴だけで歌う
  */
 (function () {
     const { repeat } = SoundKit;
 
     const wafu = {
         title: 'ことのは庭',
-        description: '笛と琴・和風で落ち着いた',
+        description: 'ピアノと琴・和風で落ち着いた',
         genre: 'ワールド',
         melody: ['lead'],
         bpm: 92,
@@ -16,10 +16,10 @@
         delay: { time: 0.75, feedback: 0.28, tone: 2400, reverb: 0.3 },
         humanize: { time: 0.008, velocity: 0.1 },
         parts: {
-            lead: { instrument: 'flute', volume: 0.96, vibrato: 6, breath: 0.06, pan: -0.1, reverb: 0.28, delay: 0.14 },
+            lead: { instrument: 'piano', volume: 0.83, pan: -0.1, reverb: 0.28, delay: 0.14 },
             // 琴：明るくはじいて、長めに響かせる
             koto: { instrument: 'pluck', mode: 'arp', from: 'A3', brightness: 0.85, sustain: 0.997, gate: 2.5, volume: 1.06, pan: 0.3, reverb: 0.25, delay: 0.1 },
-            // 琴の合いの手：笛が伸ばしている所や休みに、高めで答える
+            // 琴の合いの手：メロディが伸ばしている所や休みに、高めで答える
             fill: { instrument: 'pluck', brightness: 0.9, sustain: 0.996, gate: 2, volume: 1.5, pan: 0.35, reverb: 0.3, delay: 0.2 },
             bass: { instrument: 'pluck', mode: 'bass', octave: 2, brightness: 0.3, sustain: 0.995, release: 0.15, volume: 0.98, gate: 0.95 },
             pad: { instrument: 'pad', mode: 'chords', center: 'A3', voices: 3, volume: 0.41, cutoff: 900, reverb: 0.5 },

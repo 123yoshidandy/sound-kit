@@ -1090,6 +1090,11 @@
         metal(c, o, t, { duration: 1.2, peak: 0.04 * v, highpass: 5000, pitch: 2.1 });
     };
 
+    // 高さの違うタム（フィルで、高い所から低い所へ下りるように使う）
+    DRUM_KITS.soft.tomHigh = (c, o, t, v) => sweepTone(c, o, t, { from: 260, to: 190, sweep: 0.1, duration: 0.28, peak: 0.55 * v });
+    DRUM_KITS.soft.tomMid = (c, o, t, v) => sweepTone(c, o, t, { from: 190, to: 140, sweep: 0.11, duration: 0.32, peak: 0.58 * v });
+    DRUM_KITS.soft.tomLow = (c, o, t, v) => sweepTone(c, o, t, { from: 130, to: 90, sweep: 0.13, duration: 0.4, peak: 0.62 * v });
+
     // ブラシ：こするスネア（swish）と、たたくスネア（tap）。ジャズ向き
     DRUM_KITS.brush = {
         ...DRUM_KITS.soft,

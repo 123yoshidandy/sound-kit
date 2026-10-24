@@ -8,7 +8,7 @@
 
     // ===== BGM の候補 =====
 
-    // チップチューン：ファミコンのような音で、軽快に
+    // チップチューン：ファミコンのような音で、軽快に。A' は8分の分散和音、B は矩形波の対旋律で厚くする
     const pixel = {
         title: 'ピクセル・ステップ',
         tags: ['軽快', '明るい'],
@@ -54,6 +54,7 @@
             A2: {
                 label: "A'",
                 chords: 'C | G/B | Am | Em/G | F | G | C | C7',
+                arp: '0:2 1 2 3 2 1 2 1',
                 lead: `G5:3 E5:1 G5:2 C6:2 B5:2 G5:2 E5:4 | D5:2 G5:2 B5:3 A5:1 G5:2 D5:2 r:4 |
                        C6:3 B5:1 A5:2 E5:2 A5:2 B5:2 C6:4 | B5:2 G5:2 E5:4 r:4 G5:2 A5:2 |
                        A5:3 G5:1 A5:2 C6:2 F6:4 E6:2 C6:2 | D6:3 C6:1 B5:2 G5:2 D6:4 B5:2 G5:2 |
@@ -70,6 +71,7 @@
                 leadB: `A5:6 G5:2 E5:4 C5:4 | D5:6 E5:2 G5:4 B5:4 | B5:6 A5:2 G5:4 E5:4 | A5:8 r:4 C6:2 B5:2 |
                         A5:6 G5:2 F5:4 A5:4 | G5:6 A5:2 B5:4 D6:4 | C6:6 A5:2 F5:4 A5:4 | G5:2 A5:2 B5:2 D6:2 G6:4 r:2 B5:1 A5:1`,
                 arp: { pattern: '0:2 2 1 2 3 2 1 2', from: 'G4' },
+                counter: 'C5:16 | B4:16 | G4:16 | E5:8 C5:8 | F4:16 | G4:16 | A4:16 | B4:16',
                 bass: 'R:4 r:2 R:2 5:4 R+:4',
                 drums: {
                     kick: repeat('x.........x.....', 8, '|'),
@@ -362,7 +364,7 @@
         loop: ['A', 'B', 'A2', 'C', 'A3']
     };
 
-    // チップ×シンセポップ：チップのメロディに、今風の伴奏を合わせる
+    // チップ×シンセポップ：チップのメロディに、今風の伴奏を合わせる。A' はベルが答え、B' は弦楽器を敷く
     const neon = {
         title: 'ネオンタイル',
         tags: ['軽快', '明るい'],
@@ -378,8 +380,10 @@
             harm: { instrument: 'chip', wave: 'pulse', duty: 0.5, level: 0.07, sustain: 0.75, pan: -0.3, reverb: 0.2, humanize: false },
             pluck: { instrument: 'pluck', mode: 'arp', from: 'E4', brightness: 0.6, volume: 0.34, pan: 0.3, reverb: 0.25, delay: 0.15 },
             pad: { instrument: 'pad', mode: 'chords', center: 'D4', voices: 4, volume: 0.19, cutoff: 1600, reverb: 0.45 },
+            bell: { instrument: 'bell', volume: 0.19, pan: 0.35, reverb: 0.35, delay: 0.25 },
+            strings: { instrument: 'strings', mode: 'chords', center: 'A3', voices: 3, volume: 0.22, pan: -0.2, attack: 0.3, release: 0.6, brightness: 0.8, reverb: 0.45 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, cutoff: 380, envelope: 3, volume: 0.4, gate: 0.85 },
-            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.39, levels: { kick: 0.85, clap: 0.7, hat: 0.6, openHat: 0.5 } }
+            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.39, levels: { kick: 0.85, clap: 0.7, hat: 0.6, openHat: 0.5, crash: 0.35 } }
         },
         sections: {
             intro: {
@@ -415,7 +419,8 @@
                     kick: repeat('x...x...x...x...', 8, '|'),
                     clap: repeat('....x.......x...', 8, '|'),
                     hat: repeat('o.x.o.x.o.x.o.x.', 8, '|'),
-                    openHat: repeat('..............x.', 8, '|')
+                    openHat: repeat('..............x.', 8, '|'),
+                    crash: 'x...............|' + repeat('................', 7, '|')
                 }
             },
             A2: {
@@ -423,6 +428,7 @@
                 chords: 'Em7 | Cmaj7 | G | D/F# | Em7 | Cmaj7 | Am7 | D',
                 lead: `B4:2 E5:2 G5:2 B5:4 A5:2 G5:2 E5:2 | G5:4 E5:2 D5:2 E5:8 | r:2 B4:2 D5:2 G5:4 F#5:2 G5:2 A5:2 | A5:6 F#5:2 D5:8 |
                        B4:2 E5:2 G5:2 B5:4 A5:2 G5:2 B5:2 | C6:4 B5:2 A5:2 G5:8 | r:2 A5:2 G5:2 E5:4 D5:2 E5:2 G5:2 | F#5:8 r:8`,
+                bell: 'r:16 | r:8 B5:4 G5:4 | r:16 | r:8 A5:4 F#5:4 | r:16 | r:8 E6:4 C6:4 | r:16 | r:8 F#5:2 A5:2 D6:4',
                 pluck: '0:2 1 2 1 3 2 1 2',
                 pad: 'hold',
                 bass: 'R:2 r:2 R:2 R:2 r:2 R:2 5:2 R+:2',
@@ -452,12 +458,14 @@
                 harm: 'E5:8 G5:8 | F#5:8 A5:8 | D5:8 F#5:8 | E5:8 B4:8 | E5:8 C5:8 | F#5:8 D5:8 | G5:8 E5:8 | F#5:8 A5:8',
                 pluck: '0:2 1 2 1 3 2 1 2',
                 pad: 'hold',
+                strings: 'hold',
                 bass: 'R:2 r:2 R:2 R:2 r:2 R:2 5:2 R+:2',
                 drums: {
                     kick: repeat('x...x...x...x...', 8, '|'),
                     clap: repeat('....x.......x...', 8, '|'),
                     hat: repeat('o.x.o.x.o.x.o.x.', 8, '|'),
-                    openHat: repeat('..............x.', 8, '|')
+                    openHat: repeat('..............x.', 8, '|'),
+                    crash: 'x...............|' + repeat('................', 7, '|')
                 }
             }
         },

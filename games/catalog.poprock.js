@@ -1,5 +1,6 @@
 /**
  * 曲の一覧：青空ドライブ（ポップロック・軽快で明るい）
+ * ギターの8分のかき鳴らし、生ドラム風のキット、サビの弦楽器とシンバル、休憩のギターの分散和音
  */
 (function () {
     const { repeat } = SoundKit;
@@ -26,7 +27,7 @@
     // ビブラフォンの合いの手（2回目の A で、主題の伸ばしている所に足す）
     const COUNTER = 'r:16 | r:8 F#6:4 D6:4 | r:16 | r:8 E6:4 C6:4 | r:16 | r:8 D6:4 A5:4 | r:16 | r:12 A5:2 B5:2';
 
-    // はじく弦で、ギターの8分の刻みの代わりにする（拍の頭を強く）
+    // ギターの8分のかき鳴らし（拍の頭を強く）
     const STRUM = 'x.o.x.o.x.o.x.o.';
     // オルガンは裏で短く刻む
     const ORGAN = '..x-..x-..x-..x-';
@@ -45,6 +46,7 @@
     };
     // サビ：ハイハットを開いて、広げる
     const DRUMS_CHORUS = {
+        crash: 'x...............|' + repeat('................', 7, '|'),
         kick: repeat('x.....x.x.....x.', 8, '|'),
         snare: repeat(SNARE, 8, '|'),
         hat: repeat('x.o.x.o.x.o.x...', 8, '|'),
@@ -65,11 +67,14 @@
         parts: {
             lead: { instrument: 'piano', volume: 0.72, pan: -0.08, decay: 0.7, brightness: 0.85, reverb: 0.18, delay: 0.1 },
             counter: { instrument: 'vibes', volume: 0.5, pan: 0.3, reverb: 0.3, delay: 0.15 },
-            guitar: { instrument: 'pluck', mode: 'chords', center: 'G3', voices: 3, brightness: 0.6, sustain: 0.992, release: 0.05, gate: 0.9, volume: 0.62, pan: -0.3, reverb: 0.15 },
+            guitar: { instrument: 'guitar', mode: 'chords', center: 'G3', voices: 3, strum: 0.006, brightness: 0.55, gate: 0.9, volume: 0.6, pan: -0.3, reverb: 0.15 },
+            // 休憩の分散和音
+            arp: { instrument: 'guitar', mode: 'arp', from: 'G3', brightness: 0.5, volume: 0.6, pan: -0.25, reverb: 0.3, delay: 0.15 },
+            strings: { instrument: 'strings', mode: 'chords', center: 'E4', voices: 3, volume: 0.43, pan: 0.15, attack: 0.25, release: 0.5, brightness: 0.8, reverb: 0.4 },
             organ: { instrument: 'organ', mode: 'chords', center: 'D4', voices: 3, vibrato: 4, volume: 0.9, cutoff: 2600, pan: 0.28, gate: 0.7, reverb: 0.22 },
             pad: { instrument: 'organ', mode: 'chords', center: 'D4', voices: 3, vibrato: 4, volume: 0.36, pan: 0.2, reverb: 0.35 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, volume: 0.9, cutoff: 420, decay: 0.2, sustain: 0.4, release: 0.04, gate: 0.85 },
-            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.6, cutoff: 7500, levels: { kick: 0.85, snare: 0.6, hat: 0.4, openHat: 0.35, tom: 0.5, rim: 0.5 } }
+            drums: { instrument: 'drums', kit: 'acoustic', mode: 'drums', volume: 0.6, cutoff: 7500, levels: { kick: 0.85, snare: 0.6, hat: 0.4, openHat: 0.35, tom: 0.5, rim: 0.5, crash: 0.3 } }
         },
         sections: {
             intro: {
@@ -108,6 +113,7 @@
                 lead: CHORUS,
                 guitar: STRUM,
                 pad: 'hold',
+                strings: 'hold',
                 bass: BASS,
                 drums: DRUMS_CHORUS
             },
@@ -116,7 +122,7 @@
                 chords: 'Em7 | Cmaj7 | G | D/F# | Em7 | Cmaj7 | Am7 | D7sus4:8 D:8',
                 lead: `r:16 | r:4 G5:4 E5:8 | r:16 | r:4 A5:4 F#5:8 |
                        r:16 | r:4 B5:4 G5:8 | r:16 | r:4 G5:4 F#5:4 A5:4`,
-                guitar: 'x---x---x---x---',
+                arp: '0:2 1 2 3 2 1 2 1',
                 pad: 'hold',
                 bass: 'R:6 R:2 5:4 R:4',
                 drums: {
@@ -144,8 +150,10 @@
                 counter: 'r:16 | r:12 D6:4 | r:16 | r:12 B5:4 | r:16 | r:12 D6:4 | r:16 | r:16',
                 guitar: STRUM,
                 pad: 'hold',
+                strings: 'hold',
                 bass: BASS,
                 drums: {
+                    crash: 'x...............|' + repeat('................', 7, '|'),
                     kick: repeat('x.....x.x.....x.', 7, '|') + '|x.....x.........',
                     snare: repeat(SNARE, 7, '|') + '|....x.......x.xx',
                     hat: repeat('x.o.x.o.x.o.x...', 7, '|') + '|x.o.x.o.x.o.....',

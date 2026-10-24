@@ -1,5 +1,6 @@
 /**
  * 曲の一覧：湾岸ハイウェイ（シティポップ・7th と 9th の都会的な和音）
+ * 2・4拍目のギターのカッティング、サビのブラスの合いの手、2回目のサビの弦楽器を足す
  */
 (function () {
     const { repeat } = SoundKit;
@@ -26,6 +27,9 @@
     // エレピの和音（裏で引っかける）と、はねるベース
     const KEYS = 'x-----x---x-----';
     const BASS = 'R:3 R+:1 r:2 5:2 R:3 7:1 r:2 R:2';
+    const CHANK = '....x.......x...';
+    // サビのブラス：2小節ごとの終わりに
+    const HORNS = repeat('................|..........x-.x--', 4, '|');
 
     const DRUMS = {
         kick: repeat('x.....x...x.....', 8, '|'),
@@ -54,6 +58,9 @@
             counter: { instrument: 'vibes', volume: 0.45, pan: 0.3, reverb: 0.3, delay: 0.2 },
             keys: { instrument: 'epiano', mode: 'chords', center: 'E4', voices: 4, volume: 0.26, pan: 0.2, chorus: { depth: 0.002, rate: 0.5, mix: 0.4 }, reverb: 0.2, delay: 0.1 },
             pad: { instrument: 'pad', mode: 'chords', center: 'A3', voices: 3, volume: 0.3, cutoff: 1100, reverb: 0.45 },
+            guitar: { instrument: 'guitar', mode: 'chords', center: 'A4', voices: 3, strum: 0.004, volume: 0.5, pan: -0.32, brightness: 0.6, gate: 0.25, reverb: 0.15 },
+            horns: { instrument: 'brass', mode: 'chords', center: 'F4', voices: 3, volume: 0.45, pan: 0.3, brightness: 3.5, release: 0.08, reverb: 0.25, delay: 0.06 },
+            strings: { instrument: 'strings', mode: 'chords', center: 'A3', voices: 3, volume: 0.36, pan: -0.15, attack: 0.3, release: 0.6, brightness: 0.8, reverb: 0.45 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, volume: 0.85, cutoff: 420, decay: 0.2, sustain: 0.35, release: 0.05, gate: 0.8 },
             drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.6, cutoff: 8000, levels: { kick: 0.75, snare: 0.5, hat: 0.3 } }
         },
@@ -81,6 +88,7 @@
                 chords: 'Bbmaj9 | A7 | Dm9 | Cm7:8 F7:8 | Gm9 | C9 | Fmaj9 | Dm7:8 D7:8',
                 lead: THEME_TURN,
                 keys: KEYS,
+                guitar: CHANK,
                 bass: BASS,
                 drums: DRUMS_FILL
             },
@@ -89,6 +97,8 @@
                 chords: `${CHORDS_B} | A7`,
                 lead: CHORUS,
                 keys: KEYS,
+                guitar: CHANK,
+                horns: HORNS,
                 pad: 'hold',
                 bass: BASS,
                 drums: DRUMS
@@ -110,7 +120,8 @@
                 lead: CHORUS_LAST,
                 counter: COUNTER,
                 keys: KEYS,
-                pad: 'hold',
+                guitar: CHANK,
+                strings: 'hold',
                 bass: BASS,
                 drums: DRUMS_FILL
             }

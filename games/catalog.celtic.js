@@ -2,6 +2,7 @@
  * 曲の一覧：丘の上のジグ（アイルランドのジグ・8分の6拍子）
  * 1小節は12ステップ（付点4分音符×2）。8分音符3つずつのまとまりで書く
  * A はニ長調のミクソリディアン（C の和音で ♭7 を響かせる）、B はホ短調のドリアン（A の和音で ♮6 を響かせる）
+ * セッションのように、ブズーキ（ギター）の分散和音、アコーディオンの和音、最後の B ではフィドルがメロディを重ねる
  */
 (function () {
     const { repeat } = SoundKit;
@@ -21,6 +22,9 @@
 
     // 笛の対旋律：メロディの上で長く伸ばす
     const DESCANT_A_HEAD = 'A5:6 D6:6 | E6:12 | D6:12 | E6:6 D6:6 | D6:6 F#6:6 | E6:12';
+
+    // アコーディオン：拍の頭で、和音を短く押す
+    const SQUEEZE = 'x-....x-....';
 
     const A_CHORDS = 'D | C | D | Em | D | C | Em | A7sus4:6 A:6';
     const A2_CHORDS = 'D | C | D | Em | D | C | G:6 C:6 | D';
@@ -51,7 +55,7 @@
         melody: ['lead'],
         bpm: 126,
         stepsPerBar: 12,
-        gain: 0.046,
+        gain: 0.05,
         reverb: { seconds: 2.2, tone: 0.5 },
         delay: { time: 1.5, feedback: 0.2, tone: 2400, reverb: 0.3 },
         humanize: { time: 0.006, velocity: 0.1 },
@@ -59,8 +63,11 @@
             lead: { instrument: 'piano', volume: 0.95, decay: 0.7, brightness: 0.9, release: 0.15, pan: -0.1, reverb: 0.22, delay: 0.08 },
             // 笛：息の音を少なくして、ティンホイッスルのような澄んだ音にする
             whistle: { instrument: 'flute', volume: 0.58, vibrato: 5, breath: 0.03, attack: 0.04, pan: 0.25, reverb: 0.3, delay: 0.15 },
-            // はじく弦の分散和音（ブズーキやハープのつもり）
-            harp: { instrument: 'pluck', mode: 'arp', from: 'A3', brightness: 0.7, sustain: 0.996, volume: 1.15, pan: 0.2, reverb: 0.25 },
+            // ブズーキのつもりの、ギターの分散和音
+            harp: { instrument: 'guitar', mode: 'arp', from: 'A3', brightness: 0.6, volume: 0.75, pan: 0.2, reverb: 0.25 },
+            accordion: { instrument: 'accordion', mode: 'chords', center: 'D4', voices: 3, volume: 1.1, pan: -0.28, cutoff: 2400, reverb: 0.25 },
+            // フィドル：最後の B で、メロディを重ねる
+            fiddle: { instrument: 'strings', volume: 1, pan: 0.3, attack: 0.03, release: 0.15, brightness: 0.9, vibrato: 6, reverb: 0.3 },
             bass: { instrument: 'pluck', mode: 'bass', octave: 2, brightness: 0.35, sustain: 0.995, release: 0.15, volume: 1.1, gate: 0.9 },
             // バグパイプ風のドローン（D と A を伸ばす）。イントロと C だけ
             drone: { instrument: 'pad', volume: 0.45, cutoff: 700, attack: 1, pan: -0.15, reverb: 0.4 },
@@ -89,6 +96,7 @@
                 lead: `${A_HEAD} | ${A_END_FULL}`,
                 whistle: `${DESCANT_A_HEAD} | D6:6 C6:6 | A5:12`,
                 harp: '0:2 1 2 3 2 1',
+                accordion: SQUEEZE,
                 bass: 'R:6 5:6',
                 drums: DRUMS_A2
             },
@@ -107,6 +115,7 @@
                 lead: `${B_HEAD} | ${B_TURN} | D5:6 r:2 E5:2 F#5:2`,
                 whistle: 'G5:12 | F#5:12 | B5:12 | A5:12 | G5:12 | A5:12 | G5:12 | F#5:12',
                 harp: '0:2 2 3 1 2 3',
+                accordion: SQUEEZE,
                 bass: 'R:4 r:2 5:4 r:2',
                 drums: DRUMS_B2
             },
@@ -126,6 +135,7 @@
                 lead: `${A_HEAD} | ${A_END_FULL}`,
                 whistle: `${DESCANT_A_HEAD} | D6:6 C6:6 | A5:12`,
                 harp: '0:2 1 2 3 2 1',
+                accordion: SQUEEZE,
                 bass: 'R:6 5:6',
                 drums: DRUMS_A2
             },
@@ -134,6 +144,7 @@
                 label: 'B',
                 chords: B3_CHORDS,
                 lead: `${B_HEAD} | ${B_TURN} | D5:2 E5:2 F#5:2 E5:4 C#5:2`,
+                fiddle: `${B_HEAD} | ${B_TURN} | D5:2 E5:2 F#5:2 E5:4 C#5:2`,
                 whistle: 'E6:12 | D6:12 | B5:6 E6:6 | C#6:12 | E6:6 D6:6 | F#6:6 D6:6 | E6:6 C6:6 | D6:6 C#6:6',
                 harp: '0:2 2 3 1 2 3',
                 bass: 'R:4 r:2 5:4 r:2',

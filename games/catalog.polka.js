@@ -1,6 +1,7 @@
 /**
  * 曲の一覧：麦わら帽子のポルカ（ポルカ・2拍子の跳ねる踊り）
  * 2拍子なので stepsPerBar: 8（1小節は16分音符8つ）
+ * 裏打ちはアコーディオン、ベースはチューバ（低い金管）。トリオではトランペットが答え、A' と B' はタンバリンを足す
  */
 (function () {
     const { repeat } = SoundKit;
@@ -29,7 +30,12 @@
     const COUNTER_B = `r:8 | r:8 | r:8 | r:4 B4:2 E5:2 | r:8 | r:8 | r:8 | r:4 G5:2 B5:2 |
                        r:8 | r:8 | r:8 | r:8 | r:8 | r:4 D5:2 G5:2 | r:8 | r:8`;
 
-    // ブンチャッ：ベースが表、オルガンが裏
+    // トリオのトランペット：主題が伸ばしている所に答える
+    const TRUMPET = `r:8 | r:4 E5:2 G5:2 | r:8 | r:4 D5:2 F5:2 | r:8 | r:8 | r:8 | r:4 G4:2 C5:2 |
+                     r:8 | r:8 | r:4 C5:2 F5:2 | r:8 | r:8 | r:8 | r:4 E5:2 G5:2 | C5:2 E5:2 G5:4`;
+    const TAMBOURINE = repeat('x.o.x.o.', 16, '|');
+
+    // ブンチャッ：ベースが表、アコーディオンが裏
     const BASS = 'R:4 5:4';
     const OOMPAH = '..x...x.';
     const DRUMS = {
@@ -43,7 +49,7 @@
         hat: repeat('..o...o.', 16, '|')
     };
 
-    // ポルカ：はずむ主題と、オルガンの裏打ち
+    // ポルカ：はずむ主題と、アコーディオンの裏打ち
     const polka = {
         title: '麦わら帽子のポルカ',
         tags: ['明るい', '軽快'],
@@ -58,10 +64,12 @@
         parts: {
             lead: { instrument: 'piano', volume: 0.55, pan: -0.08, decay: 0.6, brightness: 0.85, reverb: 0.16, delay: 0.06 },
             clarinet: { instrument: 'clarinet', volume: 0.5, pan: 0.3, reverb: 0.25, delay: 0.1 },
-            organ: { instrument: 'organ', mode: 'chords', center: 'E4', voices: 3, vibrato: 5, volume: 1.5, pan: 0.22, gate: 0.4, reverb: 0.18 },
+            organ: { instrument: 'accordion', mode: 'chords', center: 'E4', voices: 3, volume: 1.2, cutoff: 2400, pan: 0.22, gate: 0.4, reverb: 0.18 },
+            trumpet: { instrument: 'brass', volume: 0.7, pan: -0.28, brightness: 3, release: 0.1, reverb: 0.25, delay: 0.08 },
             pad: { instrument: 'organ', mode: 'chords', center: 'D4', voices: 3, vibrato: 5, volume: 0.27, pan: 0.2, reverb: 0.35 },
-            bass: { instrument: 'pluck', mode: 'bass', octave: 2, brightness: 0.4, sustain: 0.994, release: 0.08, volume: 1, gate: 0.7 },
-            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.55, cutoff: 7000, levels: { kick: 0.7, rim: 0.45, hat: 0.35 } }
+            // チューバ：低い金管を短く
+            bass: { instrument: 'brass', mode: 'bass', octave: 2, brightness: 1.2, attack: 0.02, release: 0.08, volume: 1, gate: 0.6 },
+            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.55, cutoff: 7000, levels: { kick: 0.7, rim: 0.45, hat: 0.35, shaker: 0.4 } }
         },
         sections: {
             intro: {
@@ -91,6 +99,7 @@
                 label: 'トリオ',
                 chords: 'C | C | G7 | G7 | G7 | G7 | C | C | C | C7 | F | F | C/G | G7 | C | C',
                 lead: TRIO,
+                trumpet: TRUMPET,
                 organ: OOMPAH,
                 pad: 'hold',
                 bass: BASS,
@@ -112,7 +121,7 @@
                 clarinet: COUNTER_A,
                 organ: OOMPAH,
                 bass: BASS,
-                drums: DRUMS
+                drums: { ...DRUMS, shaker: TAMBOURINE }
             },
             // ループの終わりの B：合いの手を足し、D7 で頭の G へ戻る
             B2: {
@@ -122,7 +131,7 @@
                 clarinet: COUNTER_B,
                 organ: OOMPAH,
                 bass: BASS,
-                drums: DRUMS_FILL
+                drums: { ...DRUMS_FILL, shaker: TAMBOURINE }
             }
         },
         intro: ['intro'],

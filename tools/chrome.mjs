@@ -56,7 +56,10 @@ export async function launchChrome({ headless = true, chromePath = CHROME_PATHS.
     const consoleListeners = new Map();
     ws.addEventListener('message', (event) => {
         const message = JSON.parse(event.data);
-        if (message.id && pending.has(message.id)) {
+        if (message.method === 'Inspector.targetCrashed') {
+            // タブが落ちると返事が来ないので、そのタブの命令を待つのをやめる
+            failPending(new Error('タブが落ちました（メモリ不足など）'), message.sessionId);
+        } else if (message.id && pending.has(message.id)) {
             const { resolve, reject } = pending.get(message.id);
             pending.delete(message.id);
             if (message.error) reject(new Error(JSON.stringify(message.error)));
@@ -68,15 +71,24 @@ export async function launchChrome({ headless = true, chromePath = CHROME_PATHS.
             consoleListeners.get(message.sessionId)?.(`exception: ${message.params.exceptionDetails.exception?.description ?? message.params.exceptionDetails.text}`);
         }
     });
+    function failPending(error, sessionId) {
+        for (const [id, entry] of pending) {
+            if (sessionId && entry.sessionId !== sessionId) continue;
+            pending.delete(id);
+            entry.reject(error);
+        }
+    }
+    ws.addEventListener('close', () => failPending(new Error('Chrome との接続が切れました')));
     const cdp = (method, params = {}, sessionId) => new Promise((resolve, reject) => {
         const id = ++nextId;
-        pending.set(id, { resolve, reject });
+        pending.set(id, { resolve, reject, sessionId });
         ws.send(JSON.stringify({ id, method, params, sessionId }));
     });
 
     async function openPage(url, { width = 390, height = 664, mobile = true, onConsole = null } = {}) {
         const { targetId } = await cdp('Target.createTarget', { url: 'about:blank' });
         const { sessionId } = await cdp('Target.attachToTarget', { targetId, flatten: true });
+        await cdp('Inspector.enable', {}, sessionId);
         await cdp('Page.enable', {}, sessionId);
         await cdp('Runtime.enable', {}, sessionId);
         await cdp('Network.enable', {}, sessionId);

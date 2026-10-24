@@ -3,6 +3,7 @@
  * イ音を主音にしたフリジアン・ドミナント（A Bb C# D E F G）。Bb と C# の増2度が中東らしさを出す
  * 低音は A と E を伸ばすドローン。和音を変えても低音は A に留め（Gm/A・Bb/A）、Bb → A で主音へ戻る
  * 打楽器はダラブッカのマクスーム（ドゥム・タク・・タク ドゥム・・タク・）を、tom（ドゥム）と rim（タク）で叩く
+ * B では、楽団（タフト）のように弦楽器がメロディを1オクターブ下で重ねる
  */
 (function () {
     const { repeat } = SoundKit;
@@ -34,6 +35,10 @@
     const OUD_ANSWER = `${OUD_ANSWER_HEAD} | r:16 | r:8 G4:2 F4:1 E4:1 C#4:2 A3:2 | r:16 | r:8 A3:2 C#4:2 E4:2 G4:2`;
     const OUD_ANSWER2 = `${OUD_ANSWER_HEAD} | r:16 | r:8 F4:2 E4:1 D4:1 C#4:2 A3:2 | r:16 | r:8 A3:2 C#4:2 E4:2 G4:2`;
 
+    // B の弦楽器：主旋律の1オクターブ下
+    const STRINGS_B = `A4:8 F4:4 A4:4 | D5:8 C#5:2 D5:2 A4:4 | Bb4:6 A4:2 G4:8 | G4:4 Bb4:4 C#5:8 |
+                       D5:6 C#5:1 D5:1 A4:8 | F4:4 A4:4 D5:8 | D5:4 Bb4:4 G4:4 Bb4:4 | A4:8 C#4:4 E4:4`;
+
     // ドローン：低い A と E を伸ばす（和音が変わっても動かさない）
     const DRONE_A = '[A2,E3]:64 | [A2,E3]:64';
 
@@ -61,7 +66,8 @@
         parts: {
             lead: { instrument: 'piano', volume: 0.8, pan: -0.08, reverb: 0.26, delay: 0.12 },
             // ウード：暗めにはじき、短めに止める
-            oud: { instrument: 'pluck', brightness: 0.55, sustain: 0.994, gate: 1.2, volume: 0.95, pan: 0.28, reverb: 0.22, delay: 0.12 },
+            oud: { instrument: 'guitar', brightness: 0.4, gate: 1.2, volume: 0.85, pan: 0.28, reverb: 0.22, delay: 0.12 },
+            strings: { instrument: 'strings', volume: 0.88, pan: -0.25, attack: 0.06, release: 0.3, brightness: 0.8, vibrato: 12, reverb: 0.4 },
             drone: { instrument: 'pad', volume: 0.55, cutoff: 650, attack: 1.2, release: 2, reverb: 0.4 },
             pad: { instrument: 'pad', mode: 'chords', center: 'A3', voices: 3, volume: 0.5, cutoff: 900, reverb: 0.45 },
             bass: { instrument: 'pluck', mode: 'bass', octave: 2, brightness: 0.3, sustain: 0.995, release: 0.12, volume: 1.25, gate: 0.9 },
@@ -105,6 +111,7 @@
                       G3:2 r:2 Bb3:2 D4:2 G4:2 r:2 D4:2 Bb3:2 | A3:2 r:2 C#4:2 E4:2 A4:2 r:2 E4:2 C#4:2`,
                 drone: '[A2,D3]:32 | [G2,D3]:16 | E3:16 | [A2,D3]:16 | [Bb2,F3]:16 | [G2,D3]:16 | [A2,E3]:16',
                 pad: 'hold',
+                strings: STRINGS_B,
                 bass: 'R:6 r:2 R:6 r:2',
                 drums: withFill(MAQSUM_GHOST, { shaker: RIQ })
             },

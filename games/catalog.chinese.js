@@ -2,6 +2,7 @@
  * 曲の一覧：桃の花の庭（中華風）
  * ヘ調の五音音階（宮 F・商 G・角 A・徴 C・羽 D）だけで書く。B は羽（D）を中心にして、少し陰らせる
  * 和音も五音音階の音だけでできるもの（F・F6・Dm7・sus2・sus4）にして、半音の響きを出さない
+ * B では笛を休ませ、二胡（ビブラートの深い弦楽器）がメロディの下で歌う
  */
 (function () {
     const { repeat } = SoundKit;
@@ -13,6 +14,9 @@
     const A_END_HALF = 'G5:4 A5:2 G5:2 D5:4 C5:4 | F5:4 D5:4 G5:8';
     // A' の終わり：宮（F）で落ち着く
     const A_END_FULL = 'D5:4 F5:2 G5:2 A5:4 G5:4 | F5:12 r:4';
+
+    // 二胡の対旋律（B）：和音の音を伸ばす
+    const ERHU = 'F4:16 | G4:8 A4:8 | G4:16 | A4:8 F4:8 | A4:16 | G4:8 D4:8 | D4:8 F4:8 | A4:16';
 
     const A_CHORDS = 'F | Dm7 | Gsus4 | Csus4 | F6 | Dm7 | Gsus2:8 Gsus4:8 | Csus4:8 Csus2:8';
     const A2_CHORDS = 'F | Dm7 | Gsus4 | Csus4 | F6 | Dm7 | Gsus4:8 Csus4:8 | F';
@@ -47,6 +51,8 @@
             lead: { instrument: 'piano', volume: 1, decay: 0.9, brightness: 0.85, pan: -0.05, reverb: 0.3, delay: 0.12 },
             // 笛子（ディーズ）のつもり：息の音を多めに、ビブラートを深く
             dizi: { instrument: 'flute', volume: 0.5, vibrato: 10, breath: 0.07, pan: 0.25, reverb: 0.35, delay: 0.15 },
+            // 二胡のつもり：ゆっくり立ち上がり、深く揺らす
+            erhu: { instrument: 'strings', volume: 1, pan: -0.28, attack: 0.18, release: 0.4, brightness: 0.85, vibrato: 18, reverb: 0.4, delay: 0.1 },
             // 古箏：明るくはじいて、長めに響かせる
             zheng: { instrument: 'pluck', mode: 'arp', from: 'G3', brightness: 0.85, sustain: 0.997, gate: 2.5, volume: 0.9, pan: 0.3, reverb: 0.25 },
             gliss: { instrument: 'pluck', brightness: 0.9, sustain: 0.997, gate: 3, volume: 0.8, pan: 0.35, reverb: 0.3, delay: 0.1 },
@@ -94,6 +100,7 @@
                 chords: 'Dm7 | Dm7/C | Gsus4 | Dm7 | F6 | Csus2 | Gsus4:8 Csus4:8 | Dm7',
                 lead: `A5:4 C6:4 D6:6 C6:2 | A5:2 G5:2 F5:4 D5:8 | G5:4 A5:2 C6:2 D6:8 | C6:3 D6:1 C6:2 A5:2 G5:4 A5:4 |
                        F5:4 A5:4 C6:6 A5:2 | G5:6 F5:2 D5:4 C5:4 | D5:4 G5:4 F5:4 G5:4 | A5:12 r:4`,
+                erhu: ERHU,
                 zheng: '0:2 2 1 3 2 4 3 2',
                 gliss: `${REST} | ${REST} | ${REST} | r:8 ${GLISS_UP} | ${REST} | ${REST} | ${REST} | r:8 ${GLISS_DOWN}`,
                 gong: `D3:16 | ${repeat(REST, 7, ' | ')}`,

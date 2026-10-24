@@ -1,6 +1,7 @@
 /**
  * 曲の一覧：真夜中のグルーヴ（ファンク。跳ねるシンセベースと短いカッティング）
  * 曲の書き方は docs/composing.md にある。長さは16分音符の数で、'|' は小節の区切り
+ * 2・4拍目のギターのカッティング、サビの弦楽器とホーンの合いの手、休憩のコンガ（高いタム）を足す
  */
 (function () {
     const { repeat } = SoundKit;
@@ -30,6 +31,10 @@
     const BASS = 'R:2 r:1 R:1@0.55 r:2 R+:1 r:1 r:2 7:1 R+:1@0.7 r:1 5:1 r:1 R:1@0.6';
     // エレピの短いカッティング（裏で切る）
     const KEYS = '..x-...x..x-..o.';
+    // ギターのカッティング：2拍目・4拍目に短く「チャッ」
+    const CHANK = '....x.......x...';
+    // サビのホーン：2小節ごとの終わりに答える
+    const HORNS = repeat('................|............x-x-', 4, '|');
 
     const DRUMS = {
         kick: repeat('x......x..x.....', 8, '|'),
@@ -62,9 +67,12 @@
             lead: { instrument: 'piano', volume: 0.6, pan: -0.1, decay: 0.6, release: 0.1, brightness: 0.85, reverb: 0.18, delay: 0.08 },
             counter: { instrument: 'vibes', volume: 0.42, pan: 0.3, reverb: 0.3, delay: 0.15 },
             keys: { instrument: 'epiano', mode: 'chords', center: 'D4', voices: 4, volume: 0.48, pan: 0.22, decay: 0.4, release: 0.06, gate: 0.7, reverb: 0.15, chorus: { depth: 0.002, rate: 0.6, mix: 0.35 } },
+            guitar: { instrument: 'guitar', mode: 'chords', center: 'A4', voices: 3, strum: 0.004, volume: 0.53, pan: -0.32, brightness: 0.6, gate: 0.25, reverb: 0.12 },
             pad: { instrument: 'pad', mode: 'chords', center: 'A3', voices: 3, volume: 0.32, cutoff: 900, reverb: 0.4 },
+            strings: { instrument: 'strings', mode: 'chords', center: 'A3', voices: 3, volume: 0.36, pan: -0.15, attack: 0.3, release: 0.5, brightness: 0.8, reverb: 0.4 },
+            horns: { instrument: 'brass', mode: 'chords', center: 'F4', voices: 3, volume: 0.45, pan: 0.3, brightness: 4, release: 0.08, reverb: 0.22, delay: 0.06 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, volume: 1.2, cutoff: 380, decay: 0.2, sustain: 0.3, release: 0.04, gate: 0.75 },
-            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.66, cutoff: 7000, levels: { kick: 0.8, snare: 0.5, hat: 0.4, openHat: 0.35, tom: 0.45, rim: 0.5 } }
+            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.66, cutoff: 7000, levels: { kick: 0.8, snare: 0.5, hat: 0.4, openHat: 0.35, tom: 0.45, rim: 0.5, crash: 0.25, tomHigh: 0.35, tomMid: 0.35 } }
         },
         sections: {
             intro: {
@@ -90,6 +98,7 @@
                 chords: CHORDS_A2,
                 lead: THEME_END,
                 keys: KEYS,
+                guitar: CHANK,
                 bass: BASS,
                 drums: DRUMS_FILL
             },
@@ -99,9 +108,11 @@
                 lead: `D6:6 C6:2 Bb5:4 A5:4 | G5:6 Bb5:2 D6:8 | C6:6 A5:2 G5:4 E5:4 | D5:4 F5:4 A5:8 |
                        Bb5:6 A5:2 G5:4 D5:4 | E5:6 G5:2 Bb5:4 D6:4 | B5:6 G5:2 E5:4 D5:4 | C#5:6 E5:2 A5:8`,
                 keys: '..x-......x-....',
-                pad: 'hold',
+                strings: 'hold',
+                horns: HORNS,
                 bass: BASS,
                 drums: {
+                    crash: 'x...............|' + repeat('................', 7, '|'),
                     kick: repeat('x......x..x.....', 8, '|'),
                     snare: repeat('....x.......x...', 8, '|'),
                     hat: repeat('x.o.x.o.x.o.x.o.', 8, '|'),
@@ -119,7 +130,9 @@
                 drums: {
                     kick: repeat('x.........x.....', 8, '|'),
                     rim: repeat('....x.......x...', 7, '|') + '|....x.......x.x.',
-                    hat: repeat('o...o...o...o...', 8, '|')
+                    hat: repeat('o...o...o...o...', 8, '|'),
+                    tomHigh: repeat('......x...x.x...', 8, '|'),
+                    tomMid: repeat('..............x.', 8, '|')
                 }
             },
             // A に、ビブラフォンの合いの手を足す
@@ -129,6 +142,7 @@
                 lead: THEME,
                 counter: COUNTER,
                 keys: KEYS,
+                guitar: CHANK,
                 bass: BASS,
                 drums: DRUMS
             },
@@ -139,6 +153,7 @@
                 lead: THEME_LAST,
                 counter: COUNTER_LAST,
                 keys: KEYS,
+                guitar: CHANK,
                 bass: BASS,
                 drums: DRUMS_FILL
             }

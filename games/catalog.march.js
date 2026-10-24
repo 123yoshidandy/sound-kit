@@ -1,6 +1,7 @@
 /**
  * 曲の一覧：凱旋の大通り（マーチ・2拍子の行進曲）
  * 2拍子なので stepsPerBar: 8（1小節は16分音符8つ）
+ * 主題が休む所にブラスの「ジャン」、トリオにトロンボーン風の対旋律、最後の A' はグロッケンでメロディを重ねる
  */
 (function () {
     const { repeat } = SoundKit;
@@ -27,6 +28,15 @@
     // A' のフルートの合いの手（主題の伸ばしている所に）
     const COUNTER_A = `r:8 | r:8 | r:8 | r:4 F5:2 Bb5:2 | r:8 | r:8 | r:8 | r:4 C6:2 Eb6:2 |
                        r:8 | r:8 | r:8 | r:4 F5:2 Bb5:2 | r:8 | r:8 | r:8 | r:8`;
+
+    // トロンボーン風の対旋律（1回目のトリオ）：和音の音を伸ばす
+    const TROMBONE = `G3:8 | Bb3:8 | Ab3:8 | F3:8 | D3:8 | F3:4 Ab3:4 | G3:8 | Bb3:8 |
+                      G3:8 | Db4:8 | C4:8 | Eb4:4 C4:4 | Bb3:8 | Ab3:8 | G3:8 | r:8`;
+
+    // 主題が休む所（4・8・12小節目の終わり）で、ブラスが「ジャン」と鳴らす
+    const HIT = '......x-';
+    const EMPTY = '........';
+    const BRASS_HITS = [EMPTY, EMPTY, EMPTY, HIT, EMPTY, EMPTY, EMPTY, HIT, EMPTY, EMPTY, EMPTY, HIT, EMPTY, EMPTY, EMPTY, EMPTY].join('|');
 
     // ブンチャッ：ベースが表、木管の和音が裏
     const BASS = 'R:4 5:4';
@@ -55,6 +65,10 @@
             flute: { instrument: 'flute', volume: 0.45, pan: 0.3, reverb: 0.3, delay: 0.1 },
             winds: { instrument: 'clarinet', mode: 'chords', center: 'F4', voices: 3, volume: 1.03, pan: 0.22, gate: 0.5, reverb: 0.2 },
             pad: { instrument: 'pad', mode: 'chords', center: 'Bb3', voices: 3, volume: 0.32, cutoff: 1000, reverb: 0.4 },
+            brass: { instrument: 'brass', mode: 'chords', center: 'F4', voices: 3, volume: 0.5, pan: -0.25, brightness: 4, release: 0.08, reverb: 0.25 },
+            trombone: { instrument: 'brass', volume: 0.75, pan: -0.3, brightness: 1.5, attack: 0.06, release: 0.2, reverb: 0.3 },
+            // グロッケン：最後の A' でメロディを小さく重ねる
+            glock: { instrument: 'bell', volume: 0.3, pan: 0.15, decay: 0.9, reverb: 0.3 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, volume: 0.85, cutoff: 320, decay: 0.25, sustain: 0.4, release: 0.06, gate: 0.6 },
             drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.6, cutoff: 7000, levels: { kick: 0.75, snare: 0.5, openHat: 0.4, rim: 0.4, hat: 0.35 } }
         },
@@ -64,6 +78,7 @@
                 label: 'イントロ',
                 chords: 'Bb | Bb | F7 | F7',
                 winds: '........|........|' + WINDS + '|' + WINDS,
+                brass: '........|........|x--.x--.|x-x-x---',
                 bass: { pattern: `r:8 | r:8 | ${BASS} | ${BASS}` },
                 drums: {
                     snare: 'x.x.x.x.|x.x.x.x.|x.xxx.x.|xxxxx.x.',
@@ -74,6 +89,7 @@
                 chords: CHORDS_A,
                 lead: THEME,
                 winds: WINDS,
+                brass: BRASS_HITS,
                 bass: BASS,
                 drums: DRUMS
             },
@@ -93,6 +109,7 @@
                 label: 'トリオ',
                 chords: `${TRIO_CHORDS} | Eb`,
                 lead: `${TRIO_BODY} | r:8`,
+                trombone: TROMBONE,
                 winds: WINDS,
                 pad: 'hold',
                 bass: BASS,
@@ -133,7 +150,9 @@
                 chords: CHORDS_A_LAST,
                 lead: THEME_LAST,
                 flute: COUNTER_A,
+                glock: THEME_LAST,
                 winds: WINDS,
+                brass: BRASS_HITS,
                 bass: BASS,
                 drums: DRUMS
             }

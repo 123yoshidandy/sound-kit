@@ -1,5 +1,6 @@
 /**
  * 曲の一覧：ミッドナイト・フロア（ディープハウス・軽めでおしゃれ）
+ * サビでは弦楽器とシンバル、休憩の C ではカリンバの分散和音を足す
  */
 (function () {
     const { repeat } = SoundKit;
@@ -12,6 +13,7 @@
     // エレピの刻み（1拍目と、2拍目の裏・3拍目の裏の手前ではねる）
     const STAB = 'x-----x--x------';
     const BASS = 'R:2 r:1 R:1 r:2 R:2 r:2 5:2 r:2 R+:2';
+    const CRASH = 'x...............|' + repeat('................', 7, '|');
 
     // ディープハウス：エレピの 9th の和音と、シンセベース、軽い4つ打ち
     const house = {
@@ -28,10 +30,12 @@
             lead: { instrument: 'piano', volume: 0.64, pan: -0.1, decay: 0.8, brightness: 0.8, reverb: 0.22, delay: 0.18 },
             keys: { instrument: 'epiano', mode: 'chords', center: 'E4', voices: 4, volume: 0.32, pan: 0.15, chorus: { depth: 0.002, rate: 0.5, mix: 0.4 }, autopan: { rate: 0.25, depth: 0.2 }, reverb: 0.25, delay: 0.12 },
             pad: { instrument: 'pad', mode: 'chords', center: 'C4', voices: 4, volume: 0.32, cutoff: 1100, attack: 1, reverb: 0.45 },
+            strings: { instrument: 'strings', mode: 'chords', center: 'A3', voices: 3, volume: 0.5, pan: -0.2, attack: 0.4, release: 0.8, brightness: 0.75, reverb: 0.45 },
+            kalimba: { instrument: 'kalimba', mode: 'arp', from: 'A4', volume: 0.34, pan: -0.3, reverb: 0.35, delay: 0.25 },
             vibes: { instrument: 'vibes', volume: 0.55, pan: 0.25, reverb: 0.35, delay: 0.2 },
             bell: { instrument: 'bell', volume: 0.42, pan: 0.3, reverb: 0.35, delay: 0.2 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, cutoff: 360, envelope: 2.5, volume: 0.75, gate: 0.85 },
-            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.62, cutoff: 9000, levels: { kick: 0.75, clap: 0.6, openHat: 0.45, shaker: 0.4 } }
+            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.62, cutoff: 9000, levels: { kick: 0.75, clap: 0.6, openHat: 0.45, shaker: 0.4, crash: 0.25 } }
         },
         sections: {
             intro: {
@@ -74,8 +78,9 @@
                        C6:6 A5:2 G5:4 A5:4 | D6:6 B5:2 A5:4 F5:4 | G5:6 E5:2 B5:8 | A5:6 B5:2 G#5:4 E5:4`,
                 keys: STAB,
                 pad: 'hold',
+                strings: 'hold',
                 bass: BASS,
-                drums: { kick: repeat(KICK, 8, '|'), clap: repeat(CLAP, 8, '|'), openHat: repeat(OPEN, 8, '|') }
+                drums: { crash: CRASH, kick: repeat(KICK, 8, '|'), clap: repeat(CLAP, 8, '|'), openHat: repeat(OPEN, 8, '|') }
             },
             // 休憩：キックとクラップとピアノを抜き、ビブラフォンが短く歌う。最後の小節でキックが戻る
             C: {
@@ -83,6 +88,7 @@
                 vibes: `r:4 A5:4 E5:8 | r:4 B5:4 G5:8 | r:4 C6:4 G5:8 | r:4 B5:4 E5:8 |
                         r:4 A5:4 D5:8 | r:4 G5:4 B5:8 | r:4 G5:4 C6:8 | r:4 B5:4 D6:8`,
                 keys: 'x-------x-------',
+                kalimba: '0:4 2 1 3',
                 pad: 'hold',
                 bass: 'R:12 5:4',
                 drums: {
@@ -110,8 +116,10 @@
                        C6:6 A5:2 G5:4 A5:4 | D6:6 B5:2 A5:4 F5:4 | G5:6 E5:2 B5:8 | A5:6 B5:2 G#5:4 E5:4`,
                 keys: STAB,
                 pad: 'hold',
+                strings: 'hold',
                 bass: BASS,
                 drums: {
+                    crash: CRASH,
                     kick: repeat(KICK, 8, '|'),
                     clap: repeat(CLAP, 7, '|') + '|....x.......x.xx',
                     openHat: repeat(OPEN, 8, '|'),

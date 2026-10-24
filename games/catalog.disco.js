@@ -1,5 +1,6 @@
 /**
  * 曲の一覧：ミラーボール・ナイト（ディスコ・4つ打ちとオクターブのベース）
+ * 弦楽器で和音を伸ばし、A' はブラスの合いの手、サビはギターのカッティングを足す
  */
 (function () {
     const { repeat } = SoundKit;
@@ -24,6 +25,10 @@
     // オクターブで跳ねるベースと、エレピの裏の刻み
     const BASS = 'R:2 R+:2 R:2 R+:2 R:2 R+:2 R:2 R+:2';
     const KEYS = '..x-..x-..x-..x-';
+    // A' のブラス：主題が休む2・4・6小節目の終わりに
+    const HORNS = repeat('................|............x-x-', 3, '|') + '|................|................';
+    // ギターのカッティング：2拍目・4拍目に短く
+    const CHANK = '....x.......x...';
 
     const KICK = 'x...x...x...x...';
     const CLAP = '....x.......x...';
@@ -57,7 +62,9 @@
             lead: { instrument: 'piano', volume: 0.62, pan: -0.08, decay: 0.7, brightness: 0.85, reverb: 0.2, delay: 0.12 },
             counter: { instrument: 'vibes', volume: 0.45, pan: 0.3, reverb: 0.3, delay: 0.2 },
             keys: { instrument: 'epiano', mode: 'chords', center: 'D4', voices: 3, volume: 0.5, pan: 0.2, decay: 0.35, release: 0.05, gate: 0.7, reverb: 0.15, chorus: { depth: 0.002, rate: 0.6, mix: 0.35 } },
-            strings: { instrument: 'pad', mode: 'chords', center: 'Bb3', voices: 3, volume: 0.32, cutoff: 1400, reverb: 0.4 },
+            strings: { instrument: 'strings', mode: 'chords', center: 'Bb3', voices: 3, volume: 0.4, pan: -0.15, attack: 0.2, release: 0.5, brightness: 0.85, reverb: 0.4 },
+            horns: { instrument: 'brass', mode: 'chords', center: 'F4', voices: 3, volume: 0.45, pan: 0.3, brightness: 4, release: 0.08, reverb: 0.22 },
+            guitar: { instrument: 'guitar', mode: 'chords', center: 'A4', voices: 3, strum: 0.004, volume: 0.5, pan: -0.32, brightness: 0.6, gate: 0.25, reverb: 0.12 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, volume: 0.85, cutoff: 420, decay: 0.15, sustain: 0.3, release: 0.04, gate: 0.7 },
             drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.6, cutoff: 9000, levels: { kick: 0.75, clap: 0.55, openHat: 0.4, shaker: 0.35 } }
         },
@@ -86,6 +93,7 @@
                 chords: 'Gm7 | C7 | Gm7 | C7 | Cm7 | F | Bb | Bb',
                 lead: THEME_TURN,
                 keys: KEYS,
+                horns: HORNS,
                 bass: BASS,
                 drums: DRUMS_FILL
             },
@@ -94,6 +102,7 @@
                 chords: CHORDS_B,
                 lead: CHORUS,
                 keys: KEYS,
+                guitar: CHANK,
                 strings: 'hold',
                 bass: BASS,
                 drums: DRUMS_CHORUS
@@ -117,6 +126,7 @@
                 lead: CHORUS,
                 counter: COUNTER,
                 keys: KEYS,
+                guitar: CHANK,
                 strings: 'hold',
                 bass: BASS,
                 drums: DRUMS_CHORUS

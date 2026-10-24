@@ -2,6 +2,7 @@
  * 曲の一覧：カジェ・ルンバ（サルサ・イ短調で軽快に）
  * 4分音符=184 で、1小節を2拍子に感じる。クラーベは 2-3（1小節目が2つ、2小節目が3つ）
  * 曲の書き方は docs/composing.md にある。長さは16分音符の数で、'|' は小節の区切り
+ * マンボ（B）では、主題が休む小節にホーン隊が掛け合い、ギロ（シェイカー）が入る。休憩の C は弦楽器を敷く
  */
 (function () {
     const { repeat } = SoundKit;
@@ -51,6 +52,10 @@
     const COWBELL = repeat('A5:1@1 r:3 E5:1@0.6 r:3 A5:1@0.9 r:3 E5:1@0.6 r:3', 16, '|');
     const COWBELL_MAMBO = repeat('A5:1@1 r:1 E5:1@0.5 r:1 E5:1@0.6 r:1 E5:1@0.5 r:1 A5:1@0.9 r:1 E5:1@0.5 r:1 E5:1@0.6 r:1 A5:1@0.6 r:1', 16, '|');
 
+    // マンボのホーン隊：主題が休む4小節目と12小節目に吹く
+    const MONA = '................|................|................|x--.x--.x-x-x---';
+    const HORNS = MONA + '|' + repeat('................', 4, '|') + '|' + MONA + '|' + repeat('................', 4, '|');
+
     // 速いサルサを、うるさくならないように：伴奏はエレピ1つ、打楽器は軽く
     const salsa = {
         title: 'カジェ・ルンバ',
@@ -58,7 +63,7 @@
         genre: 'ラテン',
         melody: ['lead'],
         bpm: 184,
-        gain: 0.0615,
+        gain: 0.069,
         reverb: { seconds: 1.6, tone: 0.5 },
         delay: { time: 0.75, feedback: 0.2, tone: 2600 },
         humanize: { time: 0.005, velocity: 0.08 },
@@ -67,8 +72,10 @@
             flute: { instrument: 'flute', volume: 0.6, vibrato: 10, breath: 0.05, pan: -0.32, reverb: 0.28, delay: 0.12 },
             montuno: { instrument: 'epiano', mode: 'arp', from: 'A3', volume: 0.95, pan: 0.25, reverb: 0.15, decay: 0.5, release: 0.08 },
             bass: { instrument: 'pluck', mode: 'bass', octave: 2, brightness: 0.35, sustain: 0.995, release: 0.1, volume: 0.9, gate: 0.85 },
+            horns: { instrument: 'brass', mode: 'chords', center: 'E4', voices: 3, volume: 0.6, pan: 0.2, brightness: 4, release: 0.08, reverb: 0.22 },
+            strings: { instrument: 'strings', mode: 'chords', center: 'D4', voices: 3, volume: 0.48, pan: -0.15, attack: 0.35, release: 0.5, brightness: 0.75, reverb: 0.4 },
             bell: { instrument: 'bell', decay: 0.12, ratio: 1.48, index: 1.6, volume: 0.9, pan: 0.32, reverb: 0.1 },
-            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 1.2, levels: { rim: 0.6, tom: 0.6, kick: 0.6 } }
+            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 1.2, levels: { rim: 0.6, tom: 0.6, kick: 0.6, shaker: 0.4 } }
         },
         sections: {
             // イントロ：モントゥーノとクラーベから始め、3小節目でベースが入る
@@ -115,7 +122,9 @@
                 montuno: MONTUNO,
                 bass: TUMBAO,
                 bell: COWBELL_MAMBO,
+                horns: HORNS,
                 drums: {
+                    shaker: repeat('x.o.x.o.x.o.x.o.', 16, '|'),
                     rim: repeat(CLAVE, 8, '|'),
                     tom: repeat(CONGA, 7, '|') + '|......o...x.x.xx',
                     kick: repeat('......o.........|......o.........', 8, '|')
@@ -132,6 +141,8 @@
                         r:16 | r:16 | r:16 | r:4 F#5:2 A5:2 C6:4 A5:4 |
                         r:16 | r:16 | r:16 | r:16 | r:16 | r:16 | r:16 | r:16`,
                 montuno: MONTUNO_SPARSE,
+                // 前半の Am7 ⇄ D7 だけ（Fmaj7 の長7度が、主旋律の F とぶつかる）
+                strings: repeat('x---------------', 8, '|') + '|' + repeat('................', 8, '|'),
                 bass: 'r:6 R:10',
                 drums: {
                     rim: repeat(CLAVE, 8, '|'),

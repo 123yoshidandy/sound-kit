@@ -1,6 +1,7 @@
 /**
  * 曲の一覧：ひだまりの港（レゲエ。裏拍の刻みとワンドロップで、のどかに）
  * 曲の書き方は docs/composing.md にある。長さは16分音符の数で、'|' は小節の区切り
+ * スカンクはギターの短いかき鳴らし。A' はホーン隊が答え、休憩の C はメロディカ（アコーディオン）が歌う
  */
 (function () {
     const { repeat } = SoundKit;
@@ -24,9 +25,13 @@
 
     // ゆったりした低音：3拍目を空けて、ワンドロップと合わせる
     const BASS = 'R:6 R:2 r:2 5-:2 3:3 r:1';
-    // はじく弦のスカンク（2拍目と4拍目を短く）と、オルガンの裏拍の刻み
+    // ギターのスカンク（2拍目と4拍目を短く）と、オルガンの裏拍の刻み
     const SKANK = '....x-......x-..';
     const BUBBLE = '..o...o...o...o.';
+    // A' のホーン：主題が休む4・8小節目に答える
+    const HORNS = repeat('................', 3, '|') + '|........x-x-....|' + repeat('................', 3, '|') + '|........x-x-....';
+    // 休憩のメロディカ：主題が休んでいる所で歌う
+    const MELODICA = 'C5:2 E5:2 G5:4 r:8 | r:12 D5:2 E5:2 | G5:4 E5:4 r:8 | r:12 D5:2 F#5:2';
 
     // ワンドロップ：1拍目にキックを置かず、3拍目にキックとリム
     const ONE_DROP = {
@@ -58,7 +63,9 @@
         parts: {
             lead: { instrument: 'piano', volume: 0.48, pan: -0.1, decay: 0.9, brightness: 0.8, reverb: 0.25, delay: 0.14 },
             counter: { instrument: 'vibes', volume: 0.45, pan: 0.3, reverb: 0.35, delay: 0.2 },
-            skank: { instrument: 'pluck', mode: 'chords', center: 'F4', voices: 3, volume: 0.67, pan: 0.25, brightness: 0.5, sustain: 0.99, release: 0.05, gate: 0.6, reverb: 0.2, delay: 0.1 },
+            skank: { instrument: 'guitar', mode: 'chords', center: 'F4', voices: 3, strum: 0.004, volume: 0.6, pan: 0.25, brightness: 0.5, gate: 0.5, reverb: 0.2, delay: 0.1 },
+            horns: { instrument: 'brass', mode: 'chords', center: 'F4', voices: 3, volume: 0.45, pan: -0.3, brightness: 3, release: 0.1, reverb: 0.3, delay: 0.15 },
+            melodica: { instrument: 'accordion', volume: 0.5, pan: 0.3, cutoff: 2600, reverb: 0.35, delay: 0.2 },
             organ: { instrument: 'organ', mode: 'chords', center: 'D4', voices: 3, volume: 1.4, pan: -0.25, gate: 0.6, reverb: 0.2 },
             pad: { instrument: 'pad', mode: 'chords', center: 'A3', voices: 3, volume: 0.26, cutoff: 900, reverb: 0.45 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, volume: 0.41, wave: 'triangle', cutoff: 280, envelope: 1, decay: 0.8, sustain: 0.7, release: 0.12, gate: 0.9 },
@@ -91,6 +98,7 @@
                 lead: THEME_END,
                 skank: SKANK,
                 organ: BUBBLE,
+                horns: HORNS,
                 bass: BASS,
                 drums: ONE_DROP_FILL
             },
@@ -114,6 +122,7 @@
             C: {
                 chords: 'C | G | C | D7',
                 lead: 'r:8 E5:2 G5:2 C6:4 | B5:12 r:4 | r:8 E5:2 G5:2 C6:4 | A5:8 F#5:4 r:4',
+                melodica: MELODICA,
                 skank: SKANK,
                 pad: 'hold',
                 bass: 'R:6 r:2 r:4 5-:4',

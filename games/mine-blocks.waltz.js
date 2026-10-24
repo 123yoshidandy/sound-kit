@@ -1,6 +1,7 @@
 /**
  * mine-blocks の BGM の候補：オルゴールのワルツ（オルゴールとカリンバ・やさしい3拍子）
  * 3拍子なので、1小節は12ステップ（16分音符12個）
+ * 2・3拍目をギターで軽く刻んでワルツらしくし、B にはチェロのような低い弦の対旋律を足す
  */
 (function () {
     const { repeat } = SoundKit;
@@ -17,6 +18,9 @@
     const A_CHORDS = 'F | F | C/E | C | Dm | Dm/C | Bb | C7 | F | F/A | Bb | Gm7 | F/C | D7 | Gm7 | C7';
     const A2_CHORDS = 'F | F | C/E | C | Dm | Dm/C | Bb | C7 | F | F/A | Bb | Gm7 | F/C | C7 | F | F7';
 
+    // ワルツの「ズン・チャッ・チャッ」の「チャッ・チャッ」
+    const PAH = '....x-..x-..';
+
     const waltz = {
         title: 'オルゴールのワルツ',
         tags: ['落ち着いた'],
@@ -29,13 +33,18 @@
         delay: { time: 0.75, feedback: 0.25, tone: 2400, reverb: 0.3 },
         humanize: { time: 0.006, velocity: 0.08 },
         parts: {
-            lead: { instrument: 'musicBox', volume: 0.78, pan: -0.12, reverb: 0.3, delay: 0.15 },
+            lead: { instrument: 'musicBox', volume: 0.73, pan: -0.12, reverb: 0.3, delay: 0.15 },
             leadB: { instrument: 'kalimba', volume: 1, pan: -0.12, reverb: 0.28, delay: 0.12 },
             bell: { instrument: 'bell', volume: 0.5, pan: 0.3, reverb: 0.4, delay: 0.15 },
             harp: { instrument: 'pluck', mode: 'arp', from: 'C4', brightness: 0.65, volume: 0.9, pan: 0.22, reverb: 0.3 },
+            // 低い弦の対旋律（B）
+            cello: { instrument: 'strings', volume: 1.25, pan: 0.28, attack: 0.15, release: 0.4, brightness: 0.6, vibrato: 7, reverb: 0.4 },
+            // 2・3拍目の刻み
+            pah: { instrument: 'guitar', mode: 'chords', center: 'C4', voices: 3, volume: 0.64, pan: -0.25, brightness: 0.45, gate: 0.6, reverb: 0.2 },
             pad: { instrument: 'pad', mode: 'chords', center: 'F4', voices: 3, volume: 0.45, cutoff: 1000, reverb: 0.45 },
+            strings: { instrument: 'strings', mode: 'chords', center: 'F4', voices: 3, volume: 0.5, pan: -0.1, attack: 0.35, release: 0.5, brightness: 0.75, reverb: 0.45 },
             bass: { instrument: 'pluck', mode: 'bass', octave: 2, brightness: 0.35, sustain: 0.995, release: 0.15, volume: 1, gate: 0.9 },
-            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 1, levels: { kick: 0.6, shaker: 0.7 } }
+            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 1, levels: { kick: 0.6, shaker: 0.7, crash: 0.3 } }
         },
         sections: {
             intro: {
@@ -59,6 +68,8 @@
                 chords: A2_CHORDS,
                 lead: `${THEME_FIRST} | ${THEME_SECOND} | ${THEME_FULL}`,
                 harp: '0:2 1 2 3 2 1',
+                pah: PAH,
+                strings: 'hold',
                 bass: 'R:8 5:4',
                 drums: {
                     kick: repeat('x...........', 16, '|'),
@@ -72,6 +83,8 @@
                         Bb5:8 G5:4 | G5:6 F5:2 E5:4 | F5:12 | r:4 C5:4 Eb5:4 |
                         D5:4 F5:4 Bb5:4 | C6:8 G5:4 | A5:6 G5:2 E5:4 | F5:8 D5:4 |
                         G5:4 Bb5:4 D6:4 | C#6:8 A5:4 | D6:8 A5:2 F5:2 | E5:8 C5:4`,
+                cello: `D4:12 | C4:8 E4:4 | E4:12 | F4:8 D4:4 | D4:12 | E4:6 D4:6 | C4:12 | Eb4:12 |
+                        D4:12 | E4:8 G4:4 | A4:8 E4:4 | F4:8 D4:4 | Bb3:12 | C#4:12 | D4:12 | E4:6 Bb3:6`,
                 harp: { pattern: '0:2 1 2 3 2 1', from: 'F3' },
                 pad: 'hold',
                 bass: 'R:8 5:4',
@@ -100,9 +113,11 @@
                 bell: `r:12 | r:12 | r:12 | r:4 E6:4 C6:4 | r:12 | r:12 | r:12 | r:4 E6:4 D6:4 |
                        r:12 | r:12 | r:12 | r:12 | r:8 C6:4 | r:12 | r:12 | r:12`,
                 harp: '0:2 1 2 3 2 1',
+                pah: PAH,
                 pad: 'hold',
                 bass: 'R:8 5:4',
                 drums: {
+                    crash: 'x...........|' + repeat('............', 15, '|'),
                     kick: repeat('x...........', 16, '|'),
                     shaker: repeat('..o.x.o.x.o.', 16, '|')
                 }

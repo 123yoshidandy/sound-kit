@@ -1,5 +1,6 @@
 /**
  * 曲の一覧：日曜日の大合唱（ゴスペル・オルガンとピアノで大きく歌う）
+ * B と最後の A では合唱が和音を伸ばし、最後の A はタンバリンを足す
  */
 (function () {
     const { repeat } = SoundKit;
@@ -51,8 +52,9 @@
             licks: { instrument: 'organ', volume: 0.8, pan: 0.3, reverb: 0.25, delay: 0.1 },
             comp: { instrument: 'piano', mode: 'chords', center: 'Eb4', voices: 4, volume: 0.22, pan: 0.15, decay: 0.6, brightness: 0.7, reverb: 0.2 },
             organ: { instrument: 'organ', mode: 'chords', center: 'Ab3', voices: 3, volume: 0.55, cutoff: 2200, pan: -0.15, autopan: { rate: 0.8, depth: 0.25 }, reverb: 0.35 },
+            choir: { instrument: 'choir', mode: 'chords', center: 'Eb4', voices: 3, volume: 0.35, pan: 0.1, attack: 0.3, release: 0.6, reverb: 0.5 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, volume: 0.85, cutoff: 360, decay: 0.3, sustain: 0.45, release: 0.08, gate: 0.85 },
-            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.6, cutoff: 7000, levels: { kick: 0.75, clap: 0.55, hat: 0.3, tom: 0.5 } }
+            drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.6, cutoff: 7000, levels: { kick: 0.75, clap: 0.55, hat: 0.3, tom: 0.5, shaker: 0.4 } }
         },
         sections: {
             // イントロ：オルガンとピアノだけで、Eb7 へ
@@ -77,6 +79,7 @@
                 lead: `F5:4 Ab5:4 Db6:8 | Bb5:6 Ab5:2 E5:8 | Eb5:4 Ab5:4 C6:8 | A5:6 C6:2 Eb5:8 |
                        Db6:6 C6:2 Bb5:8 | G5:6 Bb5:2 Db6:8 | C6:4 Ab5:4 A5:4 C6:4 | Bb5:4 F5:4 G5:4 Eb5:4`,
                 organ: 'hold',
+                choir: 'hold',
                 comp: COMP,
                 bass: BASS,
                 drums: DRUMS_FILL
@@ -97,9 +100,10 @@
                 lead: THEME_LAST,
                 licks: LICKS_A,
                 organ: 'hold',
+                choir: 'hold',
                 comp: COMP,
                 bass: BASS,
-                drums: DRUMS_FILL
+                drums: { ...DRUMS_FILL, shaker: repeat('....x.......x...', 8, '|') }
             }
         },
         intro: ['intro'],

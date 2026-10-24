@@ -1,5 +1,6 @@
 /**
  * 曲の一覧：うすあかりの部屋（アンビエント・静かで広がりのある）
+ * B では遠くの合唱、休憩の C では弦楽器を、ゆっくり立ち上げて敷く
  */
 (function () {
     const { repeat } = SoundKit;
@@ -21,6 +22,8 @@
             bell: { instrument: 'bell', volume: 0.45, pan: 0.35, decay: 3, reverb: 0.4, delay: 0.3 },
             vibes: { instrument: 'vibes', volume: 0.6, pan: -0.25, tremolo: 3, reverb: 0.4, delay: 0.25 },
             pad: { instrument: 'pad', mode: 'chords', center: 'D4', voices: 4, volume: 0.26, cutoff: 800, attack: 1.6, release: 2.5, reverb: 0.5, chorus: { depth: 0.003, rate: 0.3, mix: 0.5 } },
+            choir: { instrument: 'choir', mode: 'chords', center: 'D4', voices: 3, volume: 0.25, pan: -0.15, attack: 1.2, release: 1.5, reverb: 0.6 },
+            strings: { instrument: 'strings', mode: 'chords', center: 'D4', voices: 3, volume: 0.3, pan: 0.15, attack: 1, release: 1.5, brightness: 0.6, reverb: 0.55 },
             bass: { instrument: 'synthBass', mode: 'bass', octave: 2, wave: 'triangle', cutoff: 220, envelope: 0.3, decay: 2, sustain: 0.8, release: 0.8, volume: 0.36, gate: 0.97 },
             drums: { instrument: 'drums', kit: 'soft', mode: 'drums', volume: 0.7, cutoff: 5000, levels: { kick: 0.5, shaker: 0.5 } }
         },
@@ -59,6 +62,7 @@
                 bell: 'r:16 | r:12 E6:4 | r:16 | r:12 A6:4 | r:16 | r:12 E6:4 | r:16 | r:16',
                 keys: '0:2 1 2 3 4 3 2 1',
                 pad: 'hold',
+                choir: 'hold',
                 bass: 'R:12 5:4',
                 drums: {
                     kick: repeat('x...............', 8, '|'),
@@ -72,6 +76,7 @@
                         r:4 E5:4 B5:8 | r:4 F#5:4 B4:8 | r:4 B5:4 A5:8 | r:8 E5:4 A4:4`,
                 keys: '0:8 2',
                 pad: 'hold',
+                strings: 'hold',
                 bass: 'R:16'
             }
         },
